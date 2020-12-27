@@ -1,0 +1,23 @@
+{
+	"scripts": {
+		"dev": "nodemon --watch src --ext ts",
+		"start": "run-p start:desktop",
+		"start:desktop": "tsc && node out",
+		"start:browser": "BROWSER=1 parcel browser/index.html",
+		"build:browser": "BROWSER=1 parcel build browser/index.html"
+	},
+	"dependencies": {
+		"@equinor/videx-vector2": "^1.0.44",
+		"glfw-raub": "^4.5.0",
+		"webgl-raub": "^2.1.0"
+	},
+	"devDependencies": {
+		"@babel/core": "^7.12.10",
+		"@types/node": "^14.14.16",
+		"nodemon": "^2.0.6",
+		"npm-run-all": "^4.1.5",
+		"parcel": "next",
+		"sass": "^1.30.0",
+		"typescript": "^4.1.3"
+	}
+}

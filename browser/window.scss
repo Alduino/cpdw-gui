@@ -1,0 +1,80 @@
+body, html {
+    margin: 0;
+    padding: 0;
+    height: 100vh;
+    overflow: hidden;
+}
+
+body {
+    background-image: url("http://thewowstyle.com/wp-content/uploads/2015/04/6881315-desktop-backgrounds.jpg");
+    background-position: center center;
+    background-repeat: no-repeat;
+    background-size: cover;
+}
+
+.window-container, .window-container-container {
+    &.eased-resize-enabled {
+        transition: 100ms ease-out;
+    }
+}
+
+.window-container-container {
+    position: absolute;
+    padding: 10px;
+
+    display: flex;
+    flex-direction: column;
+}
+
+.window-container {
+    display: flex;
+    flex-direction: column;
+
+    flex-grow: 1;
+
+    box-shadow: 5px 5px 15px #0008;
+
+    overflow: hidden;
+    transition: opacity 100ms;
+
+    &.with-border {
+        border-radius: 4px 4px 0 0;
+        border: 1px solid #474747;
+    }
+
+    &.moving {
+        opacity: .7;
+    }
+
+    .title-bar {
+        padding: .5rem;
+        background: #474747;
+        user-select: none;
+
+        color: white;
+        font-family: "SF Pro", sans-serif;
+        text-align: center;
+        font-size: .9em;
+
+        .title-bar-label {
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            overflow: hidden;
+        }
+    }
+
+    .canvas {
+        width: 100%;
+        height: 100%;
+    }
+}
+
+.window-movement-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+
+    cursor: move;
+}
