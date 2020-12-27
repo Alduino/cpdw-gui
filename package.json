@@ -9,7 +9,8 @@
 	"dependencies": {
 		"@equinor/videx-vector2": "^1.0.44",
 		"glfw-raub": "^4.5.0",
-		"webgl-raub": "^2.1.0"
+		"webgl-raub": "^2.1.0",
+		"regenerator-runtime": "^0.13.7"
 	},
 	"devDependencies": {
 		"@babel/core": "^7.12.10",

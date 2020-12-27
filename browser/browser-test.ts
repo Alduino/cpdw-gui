@@ -1,3 +1,4 @@
+import "regenerator-runtime/runtime"
 import Vector2 from "@equinor/videx-vector2";
 import {BrowserWindow} from "../src/browser/BrowserWindow";
 import "./window.scss";
