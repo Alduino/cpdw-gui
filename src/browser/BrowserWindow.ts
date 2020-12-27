@@ -1,7 +1,6 @@
 import Vector2 from "@equinor/videx-vector2";
 import {EventEmitter} from "events";
 import {WindowWrapper} from "../WindowWrapper";
-import {start} from "repl";
 
 export class BrowserWindow extends EventEmitter implements WindowWrapper {
     /**
@@ -252,7 +251,10 @@ export class BrowserWindow extends EventEmitter implements WindowWrapper {
     }
 
     set pos(val) {
-        if (this.maximised) this.restore();
+        if (this.maximised) {
+            this.restore();
+            return;
+        }
 
         this.container.style.left = `${val.x - this.innerContainer.offsetLeft}px`;
         this.container.style.top = `${Math.max(val.y, 0) - this.innerContainer.offsetTop}px`;
@@ -284,13 +286,11 @@ export class BrowserWindow extends EventEmitter implements WindowWrapper {
         return requestAnimationFrame(cb);
     }
 
-    private nonMaximisedPos: Vector2;
     private nonMaximisedSize: Vector2;
 
     maximise() {
         if (this.maximised) return;
 
-        this.nonMaximisedPos = this.pos;
         this.nonMaximisedSize = this.size;
 
         this.innerContainer.classList.add(BrowserWindow.classNames.easedResizeEnabled);
@@ -318,7 +318,8 @@ export class BrowserWindow extends EventEmitter implements WindowWrapper {
         this.innerContainer.classList.add(BrowserWindow.classNames.easedResizeEnabled);
         this.container.classList.add(BrowserWindow.classNames.easedResizeEnabled);
 
-        this.pos = this.nonMaximisedPos;
+        const displayCentre = new Vector2(this.display.offsetWidth / 2, this.display.offsetHeight / 2);
+        this.pos = displayCentre.sub(new Vector2(this.nonMaximisedSize.x / 2, this.nonMaximisedSize.y / 2));
         this.size = this.nonMaximisedSize;
 
         const that = this;
