@@ -329,6 +329,10 @@ export class BrowserWindow extends EventEmitter implements WindowWrapper {
         this.canvas.height = val.y - this.titleBar.offsetHeight;
     }
 
+    get drawSize() {
+        return new Vector2(this.canvas.width, this.canvas.height);
+    }
+
     cancelAnimationFrame(id: number) {
         cancelAnimationFrame(id);
     }
