@@ -2,6 +2,11 @@ import Vector2 from "@equinor/videx-vector2";
 import {EventEmitter} from "events";
 import {WindowWrapper} from "../WindowWrapper";
 
+interface MoveCompatibleMouseEvent {
+    pageX: number;
+    pageY: number;
+}
+
 export class BrowserWindow extends EventEmitter implements WindowWrapper {
     /**
      * Class names used for each element of the window
@@ -53,8 +58,13 @@ export class BrowserWindow extends EventEmitter implements WindowWrapper {
 
     set borderless(val) {
         this.borderlessState = val;
-        this.close();
-        this.open(this.lastGlAttrs);
+
+        if (this.isOpen) {
+            const tempSize = this.size;
+            this.close();
+            this.open(this.lastGlAttrs);
+            this.size = tempSize;
+        }
     }
 
     get isOpen() {
@@ -74,7 +84,7 @@ export class BrowserWindow extends EventEmitter implements WindowWrapper {
         this.container = null;
     }
 
-    private move(initE: MouseEvent, onMove: (pos: Vector2, initialPos: Vector2, cover: HTMLElement) => void) {
+    private move(initE: MoveCompatibleMouseEvent, onMove: (pos: Vector2, initialPos: Vector2, cover: HTMLElement) => void) {
         const movingCover = document.createElement("div");
         movingCover.className = BrowserWindow.classNames.displayMovementOverlay;
         this.display.appendChild(movingCover);
@@ -114,6 +124,46 @@ export class BrowserWindow extends EventEmitter implements WindowWrapper {
         if (inx < .5 && inx < ny && inx < iny) return "e";
         if (ny < .5 && ny < nx && ny < inx) return "n";
         if (iny < .5 && iny < nx && iny < inx) return "s";
+    }
+
+    /**
+     * Triggers the same action as clicking on the title bar.
+     * @param e - The event that triggered this action.
+     * @param target - Target element to attach listeners to. Usually should be the canvas
+     */
+    beginWindowMovement(e: MoveCompatibleMouseEvent, target: HTMLElement = this.canvas) {
+        const startMoving = () => {
+            clearTimeout(timeout);
+            target.removeEventListener("mouseup", handleMouseUp);
+            target.removeEventListener("mousemove", handleMouseMove);
+
+            this.innerContainer.classList.add(BrowserWindow.classNames.windowMoving);
+            const startPos = this.pos;
+            this.move(e, pos => {
+                this.pos = pos.add(startPos);
+            }).then(() => {
+                this.innerContainer.classList.remove(BrowserWindow.classNames.windowMoving);
+            });
+        };
+
+        const handleMouseUp = () => {
+            target.removeEventListener("mouseup", handleMouseUp);
+            target.removeEventListener("mousemove", handleMouseMove);
+            clearTimeout(timeout);
+        }
+
+        const handleMouseMove = () => {
+            target.removeEventListener("mouseup", handleMouseUp);
+            target.removeEventListener("mousemove", handleMouseMove);
+            startMoving();
+        }
+
+        const timeout = setTimeout(() => {
+            startMoving();
+        }, 150);
+
+        target.addEventListener("mouseup", handleMouseUp);
+        target.addEventListener("mousemove", handleMouseMove);
     }
 
     open(glAttrs?: WebGLContextAttributes) {
@@ -172,39 +222,7 @@ export class BrowserWindow extends EventEmitter implements WindowWrapper {
 
             titleBar.addEventListener("mousedown", e => {
                 e.preventDefault();
-
-                const startMoving = () => {
-                    clearTimeout(timeout);
-                    titleBar.removeEventListener("mouseup", handleMouseUp);
-                    titleBar.removeEventListener("mousemove", handleMouseMove);
-
-                    container.classList.add(BrowserWindow.classNames.windowMoving);
-                    const startPos = this.pos;
-                    this.move(e, pos => {
-                        this.pos = pos.add(startPos);
-                    }).then(() => {
-                        container.classList.remove(BrowserWindow.classNames.windowMoving);
-                    });
-                };
-
-                const handleMouseUp = () => {
-                    titleBar.removeEventListener("mouseup", handleMouseUp);
-                    titleBar.removeEventListener("mousemove", handleMouseMove);
-                    clearTimeout(timeout);
-                }
-
-                const handleMouseMove = () => {
-                    titleBar.removeEventListener("mouseup", handleMouseUp);
-                    titleBar.removeEventListener("mousemove", handleMouseMove);
-                    startMoving();
-                }
-
-                const timeout = setTimeout(() => {
-                    startMoving();
-                }, 150);
-
-                titleBar.addEventListener("mouseup", handleMouseUp);
-                titleBar.addEventListener("mousemove", handleMouseMove);
+                this.beginWindowMovement(e);
             });
 
             titleBar.addEventListener("dblclick", () => {
@@ -223,6 +241,28 @@ export class BrowserWindow extends EventEmitter implements WindowWrapper {
             ...glAttrs
         });
         this.lastGlAttrs = glAttrs;
+
+        const linkMouseEvent = (name: string) => {
+            canvas.addEventListener(name, (e: MouseEvent) => {
+                const pageX = e.pageX - this.pos.x - this.canvasOffset.x;
+                const pageY = e.pageY - this.pos.y - this.canvasOffset.y;
+                const ev: MouseEvent = {
+                    pageX,
+                    pageY,
+                    clientX: pageX,
+                    clientY: pageY,
+                    preventDefault: e.preventDefault.bind(e),
+                    ...e
+                };
+
+                this.emit(name, ev);
+            });
+        }
+
+        linkMouseEvent("mousemove");
+        linkMouseEvent("mousedown");
+        linkMouseEvent("mouseup");
+
         container.appendChild(canvas);
 
         containerContainer.appendChild(container);
@@ -232,6 +272,17 @@ export class BrowserWindow extends EventEmitter implements WindowWrapper {
     }
 
     private tempTitle = "Untitled Window";
+
+    /**
+     * Canvas offset from innerContainer
+     * @private
+     */
+    private get canvasOffset() {
+        return new Vector2(
+            this.canvas.offsetLeft - this.innerContainer.offsetLeft,
+            this.canvas.offsetTop - this.innerContainer.offsetTop
+        );
+    }
 
     get title() {
         if (this.isOpen) return this.titleLabel.textContent;

@@ -11,7 +11,7 @@ devDependencies:
   parcel: 2.0.0-beta.1
   sass: 1.30.0
   typescript: 4.1.3
-lockfileVersion: 5.1
+lockfileVersion: 5.2
 packages:
   /@babel/code-frame/7.12.11:
     dependencies:
@@ -1116,7 +1116,7 @@ packages:
       integrity: sha512-ksRBQcZ4OQwZ+pWl28V/G5z6JR/fZUSdXSJwyVJKCUQhKLp0qVZ0emYnZFLg+24ITemRosPH9tNMyQwzNWugsw==
   /@parcel/cache/2.0.0-beta.1_@parcel+core@2.0.0-beta.1:
     dependencies:
-      '@parcel/core': 2.0.0-beta.1_@parcel+core@2.0.0-beta.1
+      '@parcel/core': 2.0.0-beta.1
       '@parcel/logger': 2.0.0-beta.1
       '@parcel/utils': 2.0.0-beta.1
     dev: true
@@ -1140,7 +1140,7 @@ packages:
   /@parcel/config-default/2.0.0-beta.1_@parcel+core@2.0.0-beta.1:
     dependencies:
       '@parcel/bundler-default': 2.0.0-beta.1
-      '@parcel/core': 2.0.0-beta.1_@parcel+core@2.0.0-beta.1
+      '@parcel/core': 2.0.0-beta.1
       '@parcel/namer-default': 2.0.0-beta.1
       '@parcel/optimizer-cssnano': 2.0.0-beta.1
       '@parcel/optimizer-data-url': 2.0.0-beta.1
@@ -1188,7 +1188,7 @@ packages:
       '@parcel/core': ^2.0.0-alpha.3.1
     resolution:
       integrity: sha512-VEJYkiF+RNaB28OPmk1sCsOapWPisu5MXV+8N7T5ERa7xOOaD2SbD5/JnOjuUGAYKALk8UBsTCG+3ukMQ7Fiuw==
-  /@parcel/core/2.0.0-beta.1_@parcel+core@2.0.0-beta.1:
+  /@parcel/core/2.0.0-beta.1:
     dependencies:
       '@parcel/cache': 2.0.0-beta.1_@parcel+core@2.0.0-beta.1
       '@parcel/diagnostic': 2.0.0-beta.1
@@ -1212,8 +1212,6 @@ packages:
       nullthrows: 1.1.1
       semver: 5.7.1
     dev: true
-    peerDependencies:
-      '@parcel/core': '*'
     resolution:
       integrity: sha512-1KKjhL2H7z8qJNgY2M3CreYqbKopJT6ImlJk54ynIrLuJsnqKuA80FHYBiAtnSZEA65mvAJ3YLReFhg9slzbFw==
   /@parcel/diagnostic/2.0.0-beta.1:
@@ -1242,7 +1240,7 @@ packages:
       integrity: sha512-ZL3da/3jhMvu6ZwZBmxEiGXOLq+qvVvvx6DVv+4JQV0EMAFp7gvD4CH0QKLCgKBbjd1wqEBPyW3CCEo5tGtAHA==
   /@parcel/fs/2.0.0-beta.1_@parcel+core@2.0.0-beta.1:
     dependencies:
-      '@parcel/core': 2.0.0-beta.1_@parcel+core@2.0.0-beta.1
+      '@parcel/core': 2.0.0-beta.1
       '@parcel/fs-write-stream-atomic': 2.0.0-beta.1
       '@parcel/utils': 2.0.0-beta.1
       '@parcel/watcher': 2.0.0-alpha.9
@@ -1362,7 +1360,7 @@ packages:
       integrity: sha512-Mz8gkvOd6pyazQFmOjGugz6Q8ydxqjeA6PyrE21/cTj8CtmLCs4TCfEzLcU79qHyr8a+KVx4roTCUwTGv+J/7Q==
   /@parcel/optimizer-terser/2.0.0-beta.1_@parcel+core@2.0.0-beta.1:
     dependencies:
-      '@parcel/core': 2.0.0-beta.1_@parcel+core@2.0.0-beta.1
+      '@parcel/core': 2.0.0-beta.1
       '@parcel/diagnostic': 2.0.0-beta.1
       '@parcel/plugin': 2.0.0-beta.1
       '@parcel/source-map': 2.0.0-alpha.4.13
@@ -1379,7 +1377,7 @@ packages:
       integrity: sha512-S6uu4Q4L8NV+TQes35dQmHqcA6NaRmQSI0vl75IGSaTJnvnq/M3fvrTUd6Xp4dOt/eLh4UJEH7F01TbO1KFZwg==
   /@parcel/package-manager/2.0.0-beta.1_@parcel+core@2.0.0-beta.1:
     dependencies:
-      '@parcel/core': 2.0.0-beta.1_@parcel+core@2.0.0-beta.1
+      '@parcel/core': 2.0.0-beta.1
       '@parcel/diagnostic': 2.0.0-beta.1
       '@parcel/fs': 2.0.0-beta.1_@parcel+core@2.0.0-beta.1
       '@parcel/logger': 2.0.0-beta.1
@@ -1425,7 +1423,7 @@ packages:
   /@parcel/packager-js/2.0.0-beta.1_@parcel+core@2.0.0-beta.1:
     dependencies:
       '@babel/traverse': 7.12.12
-      '@parcel/core': 2.0.0-beta.1_@parcel+core@2.0.0-beta.1
+      '@parcel/core': 2.0.0-beta.1
       '@parcel/plugin': 2.0.0-beta.1
       '@parcel/scope-hoisting': 2.0.0-beta.1
       '@parcel/source-map': 2.0.0-alpha.4.13
@@ -1608,7 +1606,7 @@ packages:
       '@babel/traverse': 7.12.12
       '@parcel/babel-ast-utils': 2.0.0-beta.1
       '@parcel/babel-preset-env': 2.0.0-beta.1_@babel+core@7.12.10
-      '@parcel/core': 2.0.0-beta.1_@parcel+core@2.0.0-beta.1
+      '@parcel/core': 2.0.0-beta.1
       '@parcel/plugin': 2.0.0-beta.1
       '@parcel/utils': 2.0.0-beta.1
       browserslist: 4.16.0
@@ -1625,7 +1623,7 @@ packages:
       integrity: sha512-nP8TsjhYYvL5NjRX6WNZFXjcY66fwrPthslnycNldoHpmRDoRO1PFjqx1zzJJEUc1S0r6M2kTQhDuh4dXhANCA==
   /@parcel/transformer-coffeescript/2.0.0-beta.1_@parcel+core@2.0.0-beta.1:
     dependencies:
-      '@parcel/core': 2.0.0-beta.1_@parcel+core@2.0.0-beta.1
+      '@parcel/core': 2.0.0-beta.1
       '@parcel/plugin': 2.0.0-beta.1
       '@parcel/source-map': 2.0.0-alpha.4.13
       '@parcel/utils': 2.0.0-beta.1
@@ -1698,7 +1696,7 @@ packages:
       '@babel/types': 7.12.12
       '@parcel/babel-ast-utils': 2.0.0-beta.1
       '@parcel/babylon-walk': 2.0.0-beta.1
-      '@parcel/core': 2.0.0-beta.1_@parcel+core@2.0.0-beta.1
+      '@parcel/core': 2.0.0-beta.1
       '@parcel/diagnostic': 2.0.0-beta.1
       '@parcel/plugin': 2.0.0-beta.1
       '@parcel/scope-hoisting': 2.0.0-beta.1
@@ -1814,7 +1812,7 @@ packages:
       '@babel/template': 7.12.7
       '@babel/types': 7.12.12
       '@parcel/babel-ast-utils': 2.0.0-beta.1
-      '@parcel/core': 2.0.0-beta.1_@parcel+core@2.0.0-beta.1
+      '@parcel/core': 2.0.0-beta.1
       '@parcel/plugin': 2.0.0-beta.1
       '@parcel/utils': 2.0.0-beta.1
       react-refresh: 0.6.0
@@ -1829,7 +1827,7 @@ packages:
       integrity: sha512-PJiCdXGQgd3Z2zVs1KLie9sU5kagtMMWNVHomJ9QeG4tnvoG/J4P4klJRLO218GqBnB/s4u8vNH0QbGuQO98HQ==
   /@parcel/transformer-sass/2.0.0-beta.1_@parcel+core@2.0.0-beta.1:
     dependencies:
-      '@parcel/core': 2.0.0-beta.1_@parcel+core@2.0.0-beta.1
+      '@parcel/core': 2.0.0-beta.1
       '@parcel/fs': 2.0.0-beta.1_@parcel+core@2.0.0-beta.1
       '@parcel/plugin': 2.0.0-beta.1
       '@parcel/source-map': 2.0.0-alpha.4.13
@@ -1872,7 +1870,7 @@ packages:
       integrity: sha512-EHVS83evOcLJB2wvxQkZCWNjOAYaKg9qfnkbtvEztzx228KcQWg4IPiJgB6+dcBC5fuMBYIw0xZ24y3/3ZkPfg==
   /@parcel/transformer-typescript-types/2.0.0-beta.1_@parcel+core@2.0.0-beta.1:
     dependencies:
-      '@parcel/core': 2.0.0-beta.1_@parcel+core@2.0.0-beta.1
+      '@parcel/core': 2.0.0-beta.1
       '@parcel/plugin': 2.0.0-beta.1
       '@parcel/source-map': 2.0.0-alpha.4.13
       '@parcel/ts-utils': 2.0.0-beta.1
@@ -1946,7 +1944,7 @@ packages:
       integrity: sha512-k3luHa2W4W42uAe85v61HFMJKBf8txJmEJBB4BlHuNoFomA7lLX35nsg1APFYS/HKvf0oIEqEL1HvPRx+Dt+QA==
   /@parcel/workers/2.0.0-beta.1_@parcel+core@2.0.0-beta.1:
     dependencies:
-      '@parcel/core': 2.0.0-beta.1_@parcel+core@2.0.0-beta.1
+      '@parcel/core': 2.0.0-beta.1
       '@parcel/diagnostic': 2.0.0-beta.1
       '@parcel/logger': 2.0.0-beta.1
       '@parcel/utils': 2.0.0-beta.1
@@ -5093,7 +5091,7 @@ packages:
   /parcel/2.0.0-beta.1:
     dependencies:
       '@parcel/config-default': 2.0.0-beta.1_@parcel+core@2.0.0-beta.1
-      '@parcel/core': 2.0.0-beta.1_@parcel+core@2.0.0-beta.1
+      '@parcel/core': 2.0.0-beta.1
       '@parcel/diagnostic': 2.0.0-beta.1
       '@parcel/fs': 2.0.0-beta.1_@parcel+core@2.0.0-beta.1
       '@parcel/logger': 2.0.0-beta.1
@@ -5925,7 +5923,7 @@ packages:
       request-promise-core: 1.1.4_request@2.88.2
       stealthy-require: 1.1.1
       tough-cookie: 2.5.0
-    deprecated: 'request-promise-native has been deprecated because it extends the now deprecated request package, see https://github.com/request/request/issues/3142'
+    deprecated: request-promise-native has been deprecated because it extends the now deprecated request package, see https://github.com/request/request/issues/3142
     dev: true
     engines:
       node: '>=0.12.0'
@@ -5955,7 +5953,7 @@ packages:
       tough-cookie: 2.5.0
       tunnel-agent: 0.6.0
       uuid: 3.4.0
-    deprecated: 'request has been deprecated, see https://github.com/request/request/issues/3142'
+    deprecated: request has been deprecated, see https://github.com/request/request/issues/3142
     dev: true
     engines:
       node: '>= 6'
@@ -5972,7 +5970,7 @@ packages:
     resolution:
       integrity: sha1-six699nWiBvItuZTM17rywoYh0g=
   /resolve-url/0.2.1:
-    deprecated: 'https://github.com/lydell/resolve-url#deprecated'
+    deprecated: https://github.com/lydell/resolve-url#deprecated
     dev: true
     resolution:
       integrity: sha1-LGN/53yJOv0qZj/iGqkIAGjiBSo=
@@ -6782,7 +6780,7 @@ packages:
     resolution:
       integrity: sha512-B0yRTzYdUCCn9n+F4+Gh4yIDtMQcaJsmYBDsTSG8g/OejKBodLQ2IHfN3bM7jUsRXndopT7OIXWdYqc1fjmV6g==
   /urix/0.1.0:
-    deprecated: 'Please see https://github.com/lydell/urix#deprecated'
+    deprecated: Please see https://github.com/lydell/urix#deprecated
     dev: true
     resolution:
       integrity: sha1-2pN/emLiH+wf0Y1Js1wpNQZ6bHI=
