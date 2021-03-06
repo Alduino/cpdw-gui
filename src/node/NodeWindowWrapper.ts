@@ -36,6 +36,10 @@ export class NodeWindowWrapper extends EventEmitter implements WindowWrapper {
         this.window.height = val.y;
     }
 
+    get drawSize() {
+        return this.size;
+    }
+
     get title() {
         return this.window.title;
     }
