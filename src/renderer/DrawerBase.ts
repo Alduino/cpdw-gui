@@ -1,5 +1,5 @@
 import Drawer from "./Drawer";
-import Mesh from "./Mesh";
+import Mesh, {MeshType} from "./Mesh";
 import {Shader} from "./Shader";
 import Program from "./Program";
 
@@ -14,6 +14,7 @@ export default abstract class DrawerBase implements Drawer {
 
     private readonly ctx: WebGLRenderingContext;
 
+    private triangleMode: GLenum;
     private indices: Uint16Array;
     private mesh: Float32Array;
 
@@ -24,7 +25,19 @@ export default abstract class DrawerBase implements Drawer {
 
     private packMesh(mesh: Mesh) {
         this.mesh = DrawerBase.pack(mesh.vertices.map(v => v.toArray()));
-        this.indices = new Uint16Array(mesh.indices);
+        this.indices = mesh.indices ? new Uint16Array(mesh.indices) : null;
+
+        switch (mesh.type) {
+            case MeshType.triangles:
+                this.triangleMode = this.ctx.TRIANGLES;
+                break;
+            case MeshType.triangleFan:
+                this.triangleMode = this.ctx.TRIANGLE_FAN;
+                break;
+            case MeshType.triangleStrip:
+                this.triangleMode = this.ctx.TRIANGLE_STRIP;
+                break;
+        }
     }
 
     private bindBufferForVariable(name: string) {
@@ -87,6 +100,6 @@ export default abstract class DrawerBase implements Drawer {
 
     draw() {
         this.program.use();
-        this.ctx.drawElements(this.ctx.TRIANGLES, this.indices.length, this.ctx.UNSIGNED_SHORT, 0);
+        this.ctx.drawElements(this.triangleMode, this.indices.length, this.ctx.UNSIGNED_SHORT, 0);
     }
 }
