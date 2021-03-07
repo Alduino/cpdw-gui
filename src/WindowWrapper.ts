@@ -20,14 +20,15 @@ export interface WindowWrapper extends EventEmitterInterface {
         OnEvent<this, "blur" | "focus" | "focusin" | "focusout", [FocusEvent]> &
         OnEvent<this, "click" | "mousedown" | "mouseenter" | "mouseleave" | "mouseup", [MouseEvent]> &
         OnEvent<this, "drop", [DragEvent]> &
-        OnEvent<this, "resize", [{width: number, height: number}]> &
+        // Called when the window resizes. Params are the size of the drawable area
+        OnEvent<this, "resize", [Vector2]> &
         OnEvent<this, "iconify"> &
         OnEvent<this, "keydown" | "keyup", [KeyboardEvent]> &
         OnEvent<this, "quit"> &
         OnEvent<this, "refresh"> &
-        OnEvent<this, "wresize", [{width: number, height: number}]> &
+        OnEvent<this, "wresize", [Vector2]> &
         OnEvent<this, "wheel", [WheelEvent]> &
-        OnEvent<this, "move", [{x: number, y: number}]>
+        OnEvent<this, "move", [Vector2]>
     ;
 }
 
