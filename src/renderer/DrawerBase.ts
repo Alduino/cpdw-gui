@@ -77,9 +77,7 @@ export default abstract class DrawerBase implements Drawer {
 
     protected constructor(ctx: WebGLRenderingContext, vertexShader: Shader, fragmentShader: Shader) {
         this.ctx = ctx;
-
         this.program = this.createProgram(vertexShader, fragmentShader);
-        this.updateMesh();
     }
 
     public abstract calculateMesh(): Mesh;
