@@ -55,14 +55,14 @@ class ShaderBuilder {
 
     runAttrOperation(_: "attr", type: VariableType, name: string) {
         this.attributes.push({type,  name});
-        return `attribute ${type} ${name};`;
+        return `attribute ${type} ${name}`;
     }
 
     runUniformOperation(_: "uniform", type: VariableType, name: string, precision?: Precision) {
         this.uniforms.push({type, name});
 
-        if (precision) return `uniform ${precision} ${type} ${name};`;
-        return `uniform ${type} ${name};`;
+        if (precision) return `uniform ${precision} ${type} ${name}`;
+        return `uniform ${type} ${name}`;
     }
 
     runInclude(_: "include", value: Shader) {
