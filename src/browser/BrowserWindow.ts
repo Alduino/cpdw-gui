@@ -75,8 +75,17 @@ export class BrowserWindow extends EventEmitter implements WindowWrapper {
         return !this.isOpen;
     }
 
+    private handleResize(s: Vector2) {
+        this.ctx.viewport(0, 0, s.x, s.y);
+    }
+
+    private setupInternalListeners() {
+        this.on("resize", this.handleResize);
+    }
+
     constructor(public display: HTMLElement) {
         super();
+        this.setupInternalListeners();
     }
 
     close() {
@@ -327,6 +336,8 @@ export class BrowserWindow extends EventEmitter implements WindowWrapper {
 
         this.canvas.width = val.x;
         this.canvas.height = val.y - this.titleBar.offsetHeight;
+
+        this.emit("resize", this.drawSize);
     }
 
     get drawSize() {
