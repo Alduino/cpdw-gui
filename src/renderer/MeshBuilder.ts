@@ -13,7 +13,7 @@ export type MeshAttributes<T extends string> = {
 };
 
 export type AttributeNames<T extends string> = {
-    [key in T]: string;
+    [key in T]: string[];
 };
 
 export type PackedMesh<T extends string> = {

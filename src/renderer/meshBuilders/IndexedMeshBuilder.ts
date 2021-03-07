@@ -18,8 +18,8 @@ export default class IndexedMeshBuilder<T> implements MeshBuilder<IndexedMeshAtt
     static readonly ATTR_COORDS = "coordinates";
 
     readonly attributeNames: AttributeNames<IndexedMeshAttrs> = {
-        vertices: IndexedMeshBuilder.ATTR_COORDS,
-        indices: IndexedMeshBuilder.ATTR_COORDS
+        vertices: [IndexedMeshBuilder.ATTR_COORDS],
+        indices: [IndexedMeshBuilder.ATTR_COORDS]
     };
 
     readonly attributeTypes: MeshAttributes<IndexedMeshAttrs> = {

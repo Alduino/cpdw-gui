@@ -2,7 +2,7 @@ import Vector2 from "@equinor/videx-vector2";
 import Color from "color";
 import MeshBuilder, {AttributeNames, MeshAttributes, MeshType, PackedMesh} from "../MeshBuilder";
 
-export type ColouredIndexedMeshAttrs = "vertices" | "vertexIndices" | "colours" | "colourIndices";
+export type ColouredIndexedMeshAttrs = "vertices" | "colours" | "indices";
 
 export type Vertex = [Vector2, [number, number, number, number]];
 
@@ -22,17 +22,15 @@ export default class ColouredIndexedMeshBuilder<T> implements MeshBuilder<Colour
     static readonly ATTR_COLOUR = "colour";
 
     readonly attributeNames: AttributeNames<ColouredIndexedMeshAttrs> = {
-        vertices: ColouredIndexedMeshBuilder.ATTR_COORDS,
-        vertexIndices: ColouredIndexedMeshBuilder.ATTR_COORDS,
-        colours: ColouredIndexedMeshBuilder.ATTR_COLOUR,
-        colourIndices: ColouredIndexedMeshBuilder.ATTR_COLOUR
+        vertices: [ColouredIndexedMeshBuilder.ATTR_COORDS],
+        colours: [ColouredIndexedMeshBuilder.ATTR_COLOUR],
+        indices: [ColouredIndexedMeshBuilder.ATTR_COORDS, ColouredIndexedMeshBuilder.ATTR_COLOUR],
     };
 
     readonly attributeTypes: MeshAttributes<ColouredIndexedMeshAttrs> = {
         vertices: "ARRAY_BUFFER",
         colours: "ARRAY_BUFFER",
-        vertexIndices: "ELEMENT_ARRAY_BUFFER",
-        colourIndices: "ELEMENT_ARRAY_BUFFER"
+        indices: "ELEMENT_ARRAY_BUFFER"
     };
 
     triMode: MeshType = MeshType.triangles;
@@ -47,8 +45,7 @@ export default class ColouredIndexedMeshBuilder<T> implements MeshBuilder<Colour
         this.attributeValues = {
             vertices: new Float32Array(mesh.vertices.flatMap(v => v[0].toArray())),
             colours: new Float32Array(mesh.vertices.flatMap(v => v[1])),
-            vertexIndices: new Uint16Array(mesh.indices),
-            colourIndices: new Uint16Array(mesh.indices)
+            indices: new Uint16Array(mesh.indices)
         };
     }
 }

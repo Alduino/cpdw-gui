@@ -24,7 +24,7 @@ export default abstract class DrawerBase<T extends DrawerBase<T, TAttrs>, TAttrs
         console.debug("Binding buffer for", name);
 
         const attributes = Object.entries(this.meshBuilder.attributeNames)
-            .filter(([, value]) => value === name)
+            .filter(([, value]) => value.includes(name))
             .map(([key]) => key) as TAttrs[];
 
         if (attributes.length === 0) {
