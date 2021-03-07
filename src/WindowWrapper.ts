@@ -7,6 +7,7 @@ export interface WindowWrapper extends EventEmitterInterface {
     title: string;
     pos: Vector2;
     size: Vector2;
+    borderless: boolean;
     readonly drawSize: Vector2;
     readonly screenSize: Vector2;
     readonly closing: boolean;

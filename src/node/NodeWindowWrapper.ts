@@ -1,5 +1,5 @@
 import {EventEmitter} from "events";
-import {Document as NodeDocument} from "glfw-raub";
+import {Document as NodeDocument, WindowMode} from "glfw-raub";
 import webgl from "webgl-raub";
 import Vector2 from "@equinor/videx-vector2";
 import {WindowWrapper} from "../WindowWrapper";
@@ -48,6 +48,15 @@ export class NodeWindowWrapper extends EventEmitter implements WindowWrapper {
 
     set title(val) {
         this.window.title = val;
+    }
+
+    get borderless() {
+        return this.window.mode === WindowMode.Borderless;
+    }
+
+    set borderless(state) {
+        if (state) this.window.mode = WindowMode.Borderless;
+        else this.window.mode = WindowMode.Windowed;
     }
 
     get closing() {
