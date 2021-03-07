@@ -1,60 +1,52 @@
 import Drawer from "./Drawer";
-import Mesh, {MeshType} from "./Mesh";
 import {Shader} from "./Shader";
 import Program from "./Program";
+import MeshBuilder, {MeshType} from "./MeshBuilder";
 
-
-export default abstract class DrawerBase implements Drawer {
-    private static pack(src: number[][]) {
-        const arr = src.flat();
-        return new Float32Array(arr);
-    }
-
-    public static coordsAttr = "coordinates";
-
-    private readonly ctx: WebGLRenderingContext;
-
-    private triangleMode: GLenum;
-    private indices: Uint16Array;
-    private mesh: Float32Array;
-
-    private program: Program;
-
-    private vertexBuffer: WebGLBuffer;
-    private indexBuffer: WebGLBuffer;
-
-    private packMesh(mesh: Mesh) {
-        this.mesh = DrawerBase.pack(mesh.vertices.map(v => v.toArray()));
-        this.indices = mesh.indices ? new Uint16Array(mesh.indices) : null;
-
-        switch (mesh.type) {
+export default abstract class DrawerBase<T extends DrawerBase<T, TAttrs>, TAttrs extends string> implements Drawer {
+    private static getDrawType(ctx: WebGLRenderingContext, from: MeshType) {
+        switch (from) {
             case MeshType.triangles:
-                this.triangleMode = this.ctx.TRIANGLES;
-                break;
+                return ctx.TRIANGLES;
             case MeshType.triangleFan:
-                this.triangleMode = this.ctx.TRIANGLE_FAN;
-                break;
+                return ctx.TRIANGLE_FAN;
             case MeshType.triangleStrip:
-                this.triangleMode = this.ctx.TRIANGLE_STRIP;
-                break;
+                return ctx.TRIANGLE_STRIP;
         }
     }
+
+    private readonly ctx: WebGLRenderingContext;
+    private program: Program;
+
+    private attributeBuffers: Record<TAttrs, WebGLBuffer>;
 
     private bindBufferForVariable(name: string) {
         console.debug("Binding buffer for", name);
-        switch (name) {
-            case DrawerBase.coordsAttr:
-                this.ctx.bindBuffer(this.ctx.ARRAY_BUFFER, this.vertexBuffer);
-                this.ctx.bindBuffer(this.ctx.ELEMENT_ARRAY_BUFFER, this.indexBuffer);
-                break;
-            default:
-                throw new Error(`No buffer for variable ${name}`);
+
+        const attributes = Object.entries(this.meshBuilder.attributeNames)
+            .filter(([, value]) => value === name)
+            .map(([key]) => key) as TAttrs[];
+
+        if (attributes.length === 0) {
+            const availableAttrs = Object.values(this.meshBuilder.attributeNames).join(", ");
+            throw new Error(`Attribute ${name} does not exist.\n\nAvailable attributes: ${availableAttrs}`);
+        }
+
+        for (const attribute of attributes) {
+            const buffer = this.attributeBuffers[attribute];
+            const type = this.meshBuilder.attributeTypes[attribute];
+            this.ctx.bindBuffer(this.ctx[type], buffer);
         }
     }
 
+    private createMeshBuffers() {
+        const bufferEntries = Object.keys(this.meshBuilder.attributeTypes)
+            .map(key => [key, this.createBuffer()] as [TAttrs, WebGLBuffer]);
+        this.attributeBuffers = Object.fromEntries(bufferEntries) as Record<TAttrs, WebGLBuffer>;
+    }
+
     private createProgram(vs: Shader, fs: Shader) {
-        this.vertexBuffer = this.createBuffer();
-        this.indexBuffer = this.createBuffer();
+        this.createMeshBuffers();
 
         const program = new Program(this.ctx, vs, fs);
 
@@ -75,29 +67,39 @@ export default abstract class DrawerBase implements Drawer {
         this.ctx.bufferData(type, value, usage);
     }
 
-    protected constructor(ctx: WebGLRenderingContext, vertexShader: Shader, fragmentShader: Shader) {
+    protected constructor(ctx: WebGLRenderingContext, private meshBuilder: MeshBuilder<TAttrs, T>) {
         this.ctx = ctx;
-        this.program = this.createProgram(vertexShader, fragmentShader);
     }
 
-    public abstract calculateMesh(): Mesh;
-
     /**
-     * Calls calculateMesh, and saves the value for `draw`
+     * Must be the last thing to run in the constructor
      * @protected
      */
-    protected updateMesh() {
-        this.packMesh(this.calculateMesh());
-        this.updateBuffer(this.vertexBuffer, this.mesh, this.ctx.ARRAY_BUFFER);
-        this.updateBuffer(this.indexBuffer, this.indices, this.ctx.ELEMENT_ARRAY_BUFFER);
+    protected init(vertexShader: Shader, fragmentShader: Shader) {
+        this.program = this.createProgram(vertexShader, fragmentShader);
+        this.updateMesh();
+        console.log(this.attributeBuffers);
     }
 
     protected setUniform(name: string, ...value: number[]) {
         this.program.setUniform(name, ...value);
     }
 
+    protected updateMesh() {
+        // this isn't necessarily assignable to T, but that is the whole point of T so we will assume it here
+        this.meshBuilder.build(this as unknown as T);
+
+        // update the buffers
+        const entries = Object.entries(this.meshBuilder.attributeValues) as [TAttrs, BufferSource][];
+        for (const [key, value] of entries) {
+            this.updateBuffer(this.attributeBuffers[key], value, this.ctx[this.meshBuilder.attributeTypes[key]]);
+        }
+    }
+
     draw() {
         this.program.use();
-        this.ctx.drawElements(this.triangleMode, this.indices.length, this.ctx.UNSIGNED_SHORT, 0);
+
+        const drawType = DrawerBase.getDrawType(this.ctx, this.meshBuilder.triMode);
+        this.ctx.drawElements(drawType, this.meshBuilder.vertexCount, this.ctx.UNSIGNED_SHORT, 0);
     }
 }

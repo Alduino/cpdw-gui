@@ -34,7 +34,7 @@ type IncludeOp = Parameters<typeof ShaderBuilder.prototype.runInclude>;
 
 type Operation = AttributeInitOp | UniformInitOp | IncludeOp;
 
-interface Variable {
+export interface Variable {
     type: VariableType;
     name: string;
 }
