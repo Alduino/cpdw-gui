@@ -17,16 +17,16 @@ export interface WindowWrapper extends EventEmitterInterface {
     cancelAnimationFrame(id: number): void;
 
     on:
-        OnEvent<this, "blur" | "focus" | "focusin" | "focusout", [FocusEvent]> |
-        OnEvent<this, "click" | "mousedown" | "mouseenter" | "mouseleave" | "mouseup", [MouseEvent]> |
-        OnEvent<this, "drop", [DragEvent]> |
-        OnEvent<this, "resize", [{width: number, height: number}]> |
-        OnEvent<this, "iconify"> |
-        OnEvent<this, "keydown" | "keyup", [KeyboardEvent]> |
-        OnEvent<this, "quit"> |
-        OnEvent<this, "refresh"> |
-        OnEvent<this, "wresize", [{width: number, height: number}]> |
-        OnEvent<this, "wheel", [WheelEvent]> |
+        OnEvent<this, "blur" | "focus" | "focusin" | "focusout", [FocusEvent]> &
+        OnEvent<this, "click" | "mousedown" | "mouseenter" | "mouseleave" | "mouseup", [MouseEvent]> &
+        OnEvent<this, "drop", [DragEvent]> &
+        OnEvent<this, "resize", [{width: number, height: number}]> &
+        OnEvent<this, "iconify"> &
+        OnEvent<this, "keydown" | "keyup", [KeyboardEvent]> &
+        OnEvent<this, "quit"> &
+        OnEvent<this, "refresh"> &
+        OnEvent<this, "wresize", [{width: number, height: number}]> &
+        OnEvent<this, "wheel", [WheelEvent]> &
         OnEvent<this, "move", [{x: number, y: number}]>
     ;
 }
