@@ -14,7 +14,7 @@ function moduleIsHot(module: any): module is Hot {
     win.open();
     win.title = `My new window (random:${Date.now() % 1000})`;
     win.size = new Vector2(800, 600);
-    win.pos = new Vector2(150, 150);
+    win.pos = new Vector2(640, 10);
 
     // @ts-ignore
     win.on("mousedown", e => {

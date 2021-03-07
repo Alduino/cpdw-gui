@@ -2,23 +2,26 @@ import {Spector} from "spectorjs";
 import Vector2 from "@equinor/videx-vector2";
 import {WindowWrapper} from "../WindowWrapper";
 import DrawerBase from "../renderer/DrawerBase";
-import Mesh, {MeshType} from "../renderer/Mesh";
 import createShader from "../renderer/Shader";
 import {perFrame} from "../WindowUtils";
+import Button from "../renderer/component/Button";
 
-class Polygon extends DrawerBase {
+/*class Polygon extends DrawerBase {
     private static vertexShader = createShader`
         ${["attr", "vec2", DrawerBase.coordsAttr]}
         ${["uniform", "float", "scale", "lowp"]}
-        
+
+        out vec4 color;
+
         void main() {
+            color = vec4(${DrawerBase.coordsAttr} / 2. + .5, 0., 1.);
             gl_Position = vec4(${DrawerBase.coordsAttr} * scale, 0., 1.);
         }
     `;
 
-    private static fragmentShader = createShader`    
+    private static fragmentShader = createShader`
         void main() {
-            gl_FragColor = vec4(.0, .5, 1., 1.);
+            gl_FragColor = color;
         }
     `;
 
@@ -50,15 +53,13 @@ class Polygon extends DrawerBase {
         this.edges = val;
         this.updateMesh();
     }
-}
+}*/
 
 export function test(win: WindowWrapper) {
-    const testDrawer = new Polygon(win.ctx, 16);
-    perFrame(win, (_, t) => {
-        testDrawer.sides = Math.floor((Math.sin(t / 1000) / 2 + .5) * 29 + 3);
+    const button = new Button(win.ctx);
 
-        testDrawer.scale = .7;
-        testDrawer.draw();
+    perFrame(win, (_, t) => {
+        button.draw();
     });
 
     if (process.env.BROWSER) (new Spector()).displayUI();
