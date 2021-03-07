@@ -1,8 +1,8 @@
-import "regenerator-runtime/runtime"
+import "regenerator-runtime/runtime";
 import Vector2 from "@equinor/videx-vector2";
 import {BrowserWindow} from "../src/browser/BrowserWindow";
 import "./window.scss";
-import {test} from "../src/test-gl";
+import {test} from "../src/example/test-gl";
 
 interface Hot { hot: any; }
 function moduleIsHot(module: any): module is Hot {
@@ -12,9 +12,9 @@ function moduleIsHot(module: any): module is Hot {
 (async () => {
     const win = new BrowserWindow(document.body);
     win.open();
-    win.title = `My new window (${Date.now() % 1000})`;
+    win.title = `My new window (random:${Date.now() % 1000})`;
     win.size = new Vector2(800, 600);
-    win.pos = new Vector2(0, 0);
+    win.pos = new Vector2(150, 150);
 
     // @ts-ignore
     win.on("mousedown", e => {
