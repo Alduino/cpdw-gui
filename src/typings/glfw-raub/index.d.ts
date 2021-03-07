@@ -538,4 +538,8 @@ declare module "glfw-raub" {
         requestAnimationFrame(cb: () => void): number;
         cancelAnimationFrame(id: number): void;
     }
+
+    export class Document extends Window {
+        static setWebgl(webgl: WebGLRenderingContext): void;
+    }
 }

@@ -1,11 +1,13 @@
 import {EventEmitter} from "events";
-import {Window as NodeWindow} from "glfw-raub";
+import {Document as NodeDocument} from "glfw-raub";
 import webgl from "webgl-raub";
 import Vector2 from "@equinor/videx-vector2";
 import {WindowWrapper} from "../WindowWrapper";
 
+NodeDocument.setWebgl(webgl);
+
 export class NodeWindowWrapper extends EventEmitter implements WindowWrapper {
-    constructor(private window: NodeWindow) {
+    constructor(private window: NodeDocument) {
         super();
 
         this.ctx = webgl;

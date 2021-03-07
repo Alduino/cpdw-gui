@@ -8,8 +8,8 @@ async function createWindow(): Promise<WindowWrapper> {
         return win;
     } else {
         const {NodeWindowWrapper} = await import("./node/NodeWindowWrapper");
-        const {Window: NodeWindow} = await import("glfw-raub");
-        return new NodeWindowWrapper(new NodeWindow());
+        const {Document: NodeDocument} = await import("glfw-raub");
+        return new NodeWindowWrapper(new NodeDocument());
     }
 }
 
