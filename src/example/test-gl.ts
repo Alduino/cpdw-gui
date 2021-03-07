@@ -55,8 +55,6 @@ class Polygon extends DrawerBase {
 export function test(win: WindowWrapper) {
     const testDrawer = new Polygon(win.ctx, 16);
     perFrame(win, (_, t) => {
-        win.ctx.clear(win.ctx.COLOR_BUFFER_BIT);
-
         testDrawer.sides = Math.floor((Math.sin(t / 1000) / 2 + .5) * 29 + 3);
 
         testDrawer.scale = .7;
