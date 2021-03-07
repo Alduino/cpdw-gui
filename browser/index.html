@@ -3,8 +3,27 @@
 <head>
     <meta charset="UTF-8">
     <title>Browser test</title>
+    <style>
+        #description {
+            position: fixed;
+            top: 0;
+            left: 0;
+            padding: 1em;
+
+            background: white;
+            z-index: 99999;
+
+            margin: 0;
+
+            border-bottom-right-radius: 3px;
+        }
+    </style>
 </head>
 <body>
+<p id="description">
+    <strong>Hello!</strong> This works natively too!
+    The source is separate, find it on <a href="https://github.com/alduino/cpdw-gui" target="_blank">GitHub</a>.
+</p>
 <script src="browser-test.ts"></script>
 </body>
 </html>
