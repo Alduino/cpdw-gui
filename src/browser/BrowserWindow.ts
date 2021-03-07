@@ -247,6 +247,7 @@ export class BrowserWindow extends EventEmitter implements WindowWrapper {
         this.canvas = canvas;
         this.context = canvas.getContext("webgl", {
             alpha: false,
+            preserveDrawingBuffer: true,
             ...glAttrs
         });
         this.lastGlAttrs = glAttrs;
