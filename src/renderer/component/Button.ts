@@ -1,66 +1,129 @@
 import Vector2 from "@equinor/videx-vector2";
 import DrawerBase from "../DrawerBase";
 import createShader from "../Shader";
-import ColouredIndexedMeshBuilder, {ColouredIndexedMeshAttrs} from "../meshBuilders/ColouredIndexedMeshBuilder";
+import ColouredIndexedMeshBuilder, {Colour} from "../meshBuilders/ColouredIndexedMeshBuilder";
+import {transformShader, UNIFORM_OFFSET, UNIFORM_SCALE, UNIFORM_VIEWPORT_SIZE} from "../util/transform";
 
-export default class Button extends DrawerBase<Button, ColouredIndexedMeshAttrs> {
+export default class Button extends DrawerBase {
     // language=GLSL
     private static vertexShader = createShader`
-        ${["attr", "vec2", ColouredIndexedMeshBuilder.ATTR_COORDS]};
+        precision mediump float;
+        
+        ${["include", transformShader]}
+        
+        ${["var", ColouredIndexedMeshBuilder.ATTR_COORD]};
+        ${["var", ColouredIndexedMeshBuilder.ATTR_COLOUR]};
+        
+        varying vec4 displayColour;
 
         void main() {
-            gl_Position = vec4(${ColouredIndexedMeshBuilder.ATTR_COORDS}, 0., 1.);
+            displayColour = ${["ref", ColouredIndexedMeshBuilder.ATTR_COLOUR]};
+            gl_Position = vec4(
+                transform(${["ref", ColouredIndexedMeshBuilder.ATTR_COORD]}),
+                0., 1.
+            );
         }
     `;
 
     // language=GLSL
     private static fragmentShader = createShader`
+        precision mediump float;
+
+        varying vec4 displayColour;
+        
         void main() {
-            gl_FragColor = vec4(1., .5, 0., 1.);
+            gl_FragColor = displayColour;
         }
     `;
 
-    private static meshBuilder = new ColouredIndexedMeshBuilder<Button>(p => ({
-        vertices: [
-            // main rectangle points
-            [new Vector2(-1, -1), [255, 255, 255, 1]],
-            [new Vector2(1, -1), [255, 255, 0, 1]],
-            [new Vector2(1, 1), [255, 0, 255, 1]],
-            [new Vector2(-1, 1), [0, 255, 255, 1]],
+    private static meshBuilder = new ColouredIndexedMeshBuilder<Button>(p => {
+        // second number is the id of the part of the shape
+        // 1=border, 0=inner
+        const borderColour: Colour = [.45, .45, .45, 1];
+        const innerColour: Colour = [.95, .95, .95, 0];
 
-            // border rectangle points
-            [new Vector2(1, -1 + p._borderSize.y), [255, 0, 0, 1]],
-            [new Vector2(1, 1 - p._borderSize.y), [0, 255, 0, 1]],
-            [new Vector2(-1, 1 - p._borderSize.y), [0, 0, 255, 1]],
-            [new Vector2(-1, -1 + p._borderSize.y), [0, 0, 0, 1]],
+        const left = -p.size.x / 2;
+        const right = p.size.x / 2;
+        const top = -p.size.y / 2;
+        const bottom = p.size.y / 2;
 
-            // inner rectangle
-            [new Vector2(-1 + p._borderSize.x, -1 + p._borderSize.y), [255, 255, 127, 1]],
-            [new Vector2(1 - p._borderSize.x, -1 + p._borderSize.y), [255, 127, 255, 1]],
-            [new Vector2(1 - p._borderSize.x, 1 - p._borderSize.y), [255, 127, 127, 1]],
-            [new Vector2(-1 + p._borderSize.x, 1 - p._borderSize.y), [127, 255, 255, 1]]
-        ],
-        indices: [
-            // border
-            0, 1, 7,
-            1, 4, 7,
-            4, 10, 9,
-            4, 5, 10,
-            5, 2, 3,
-            5, 3, 6,
-            8, 11, 6,
-            7, 8, 6,
+        return ({
+            vertices: [
+                // main rectangle points
+                [new Vector2(left, top), borderColour],
+                [new Vector2(right, top), borderColour],
+                [new Vector2(right, bottom), borderColour],
+                [new Vector2(left, bottom), borderColour],
 
-            // inner rectangle
-            8, 9, 11,
-            9, 10, 11
-        ]
-    }));
+                // border rectangle points
+                [new Vector2(right, top + p._borderSize.y), borderColour],
+                [new Vector2(right, bottom - p._borderSize.y), borderColour],
+                [new Vector2(left, bottom - p._borderSize.y), borderColour],
+                [new Vector2(left, top + p._borderSize.y), borderColour],
 
-    private _borderSize = new Vector2(.1);
+                // inner rectangle (with border colour)
+                [new Vector2(left + p._borderSize.x, top + p._borderSize.y), borderColour],
+                [new Vector2(right - p._borderSize.x, top + p._borderSize.y), borderColour],
+                [new Vector2(right - p._borderSize.x, bottom - p._borderSize.y), borderColour],
+                [new Vector2(left + p._borderSize.x, bottom - p._borderSize.y), borderColour],
+
+                // inner rectangle (with inner colour)
+                [new Vector2(left + p._borderSize.x, top + p._borderSize.y), innerColour],
+                [new Vector2(right - p._borderSize.x, top + p._borderSize.y), innerColour],
+                [new Vector2(right - p._borderSize.x, bottom - p._borderSize.y), innerColour],
+                [new Vector2(left + p._borderSize.x, bottom - p._borderSize.y), innerColour]
+            ],
+            indices: [
+                // border
+                0, 1, 7,
+                1, 4, 7,
+                4, 10, 9,
+                4, 5, 10,
+                5, 2, 3,
+                5, 3, 6,
+                8, 11, 6,
+                7, 8, 6,
+
+                // inner rectangle
+                12, 13, 15,
+                13, 14, 15
+            ]
+        });
+    });
+
+    private _borderSize = new Vector2(5);
+    private _size = new Vector2(120, 16 * 3);
 
     constructor(ctx: WebGLRenderingContext) {
         super(ctx, Button.meshBuilder);
         this.init(Button.vertexShader, Button.fragmentShader);
+
+        this.scale = new Vector2(1);
+    }
+
+    handleResize(size: Vector2) {
+        this.getVariable(UNIFORM_VIEWPORT_SIZE).set(size);
+    }
+
+    set scale(v: Vector2) { this.getVariable(UNIFORM_SCALE).set(v); }
+    set position(v: Vector2) { this.getVariable(UNIFORM_OFFSET).set(v); }
+
+    get borderSize() {
+        return this._borderSize;
+    }
+
+    // @mesh-update
+    set borderSize(v) {
+        this._borderSize = v;
+        this.updateMesh();
+    }
+
+    get size() {
+        return this._size;
+    }
+
+    set size(v) {
+        this._size = v;
+        this.updateMesh();
     }
 }

@@ -1,10 +1,11 @@
 import Vector2 from "@equinor/videx-vector2";
-import Color from "color";
-import MeshBuilder, {AttributeNames, MeshAttributes, MeshType, PackedMesh} from "../MeshBuilder";
+import MeshBuilder, {MeshType} from "../MeshBuilder";
+import DrawerBase from "../DrawerBase";
+import {aVec2b} from "../variables/attribute/Vec2BufferAttributeVariable";
+import {aVec4b} from "../variables/attribute/Vec4BufferAttributeVariable";
 
-export type ColouredIndexedMeshAttrs = "vertices" | "colours" | "indices";
-
-export type Vertex = [Vector2, [number, number, number, number]];
+export type Colour = [number, number, number, number];
+export type Vertex = [Vector2, Colour];
 
 export interface ColouredIndexedMesh {
     // defaults to the previous value, or triangles
@@ -17,24 +18,11 @@ export interface ColouredIndexedMesh {
     indices: number[];
 }
 
-export default class ColouredIndexedMeshBuilder<T> implements MeshBuilder<ColouredIndexedMeshAttrs, T> {
-    static readonly ATTR_COORDS = "coordinates";
-    static readonly ATTR_COLOUR = "colour";
-
-    readonly attributeNames: AttributeNames<ColouredIndexedMeshAttrs> = {
-        vertices: [ColouredIndexedMeshBuilder.ATTR_COORDS],
-        colours: [ColouredIndexedMeshBuilder.ATTR_COLOUR],
-        indices: [ColouredIndexedMeshBuilder.ATTR_COORDS, ColouredIndexedMeshBuilder.ATTR_COLOUR],
-    };
-
-    readonly attributeTypes: MeshAttributes<ColouredIndexedMeshAttrs> = {
-        vertices: "ARRAY_BUFFER",
-        colours: "ARRAY_BUFFER",
-        indices: "ELEMENT_ARRAY_BUFFER"
-    };
+export default class ColouredIndexedMeshBuilder<T extends DrawerBase> implements MeshBuilder<T> {
+    static readonly ATTR_COORD = aVec2b("meshCoord", {});
+    static readonly ATTR_COLOUR = aVec4b("meshColour", {});
 
     triMode: MeshType = MeshType.triangles;
-    attributeValues: PackedMesh<ColouredIndexedMeshAttrs>;
     vertexCount: number;
 
     constructor(private generate: (param: T) => ColouredIndexedMesh) {}
@@ -42,10 +30,18 @@ export default class ColouredIndexedMeshBuilder<T> implements MeshBuilder<Colour
     build(param: T): void {
         const mesh = this.generate(param);
 
-        this.attributeValues = {
-            vertices: new Float32Array(mesh.vertices.flatMap(v => v[0].toArray())),
-            colours: new Float32Array(mesh.vertices.flatMap(v => v[1])),
-            indices: new Uint16Array(mesh.indices)
-        };
+        // set our variables
+        param.getVariable(ColouredIndexedMeshBuilder.ATTR_COORD).set({
+            values: mesh.vertices.map(v => v[0]),
+            indices: mesh.indices
+        });
+
+        param.getVariable(ColouredIndexedMeshBuilder.ATTR_COLOUR).set({
+            values: mesh.vertices.map(v => v[1]),
+            indices: mesh.indices
+        });
+
+        this.vertexCount = mesh.indices.length;
+        if (typeof mesh.type !== "undefined") this.triMode = mesh.type;
     }
 }

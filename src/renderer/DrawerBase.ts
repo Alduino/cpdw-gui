@@ -1,9 +1,11 @@
 import Drawer from "./Drawer";
-import {Shader} from "./Shader";
+import {ShaderBuilder} from "./Shader";
 import Program from "./Program";
 import MeshBuilder, {MeshType} from "./MeshBuilder";
+import Variable, {VariableCache, VariableCreator} from "./Variable";
+import Bindable, {isBindable} from "./variables/Bindable";
 
-export default abstract class DrawerBase<T extends DrawerBase<T, TAttrs>, TAttrs extends string> implements Drawer {
+export default abstract class DrawerBase implements Drawer {
     private static getDrawType(ctx: WebGLRenderingContext, from: MeshType) {
         switch (from) {
             case MeshType.triangles:
@@ -15,45 +17,14 @@ export default abstract class DrawerBase<T extends DrawerBase<T, TAttrs>, TAttrs
         }
     }
 
+    private readonly variableCache: VariableCache = new Map();
+
     private readonly ctx: WebGLRenderingContext;
     private program: Program;
 
-    private attributeBuffers: Record<TAttrs, WebGLBuffer>;
-
-    private bindBufferForVariable(name: string) {
-        console.debug("Binding buffer for", name);
-
-        const attributes = Object.entries(this.meshBuilder.attributeNames)
-            .filter(([, value]) => value.includes(name))
-            .map(([key]) => key) as TAttrs[];
-
-        if (attributes.length === 0) {
-            const availableAttrs = Object.values(this.meshBuilder.attributeNames).join(", ");
-            throw new Error(`Attribute ${name} does not exist.\n\nAvailable attributes: ${availableAttrs}`);
-        }
-
-        for (const attribute of attributes) {
-            const buffer = this.attributeBuffers[attribute];
-            const type = this.meshBuilder.attributeTypes[attribute];
-            this.ctx.bindBuffer(this.ctx[type], buffer);
-        }
-    }
-
-    private createMeshBuffers() {
-        const bufferEntries = Object.keys(this.meshBuilder.attributeTypes)
-            .map(key => [key, this.createBuffer()] as [TAttrs, WebGLBuffer]);
-        this.attributeBuffers = Object.fromEntries(bufferEntries) as Record<TAttrs, WebGLBuffer>;
-    }
-
-    private createProgram(vs: Shader, fs: Shader) {
-        this.createMeshBuffers();
-
+    private createProgram(vs: ShaderBuilder, fs: ShaderBuilder) {
         const program = new Program(this.ctx, vs, fs);
-
-        program.bindBuffer = this.bindBufferForVariable.bind(this);
-
-        program.createProgram();
-        program.setupVariables();
+        program.createProgram(this.variableCache);
 
         return program;
     }
@@ -67,7 +38,7 @@ export default abstract class DrawerBase<T extends DrawerBase<T, TAttrs>, TAttrs
         this.ctx.bufferData(type, value, usage);
     }
 
-    protected constructor(ctx: WebGLRenderingContext, private meshBuilder: MeshBuilder<TAttrs, T>) {
+    protected constructor(ctx: WebGLRenderingContext, private meshBuilder: MeshBuilder<DrawerBase>) {
         this.ctx = ctx;
     }
 
@@ -75,31 +46,31 @@ export default abstract class DrawerBase<T extends DrawerBase<T, TAttrs>, TAttrs
      * Must be the last thing to run in the constructor
      * @protected
      */
-    protected init(vertexShader: Shader, fragmentShader: Shader) {
+    protected init(vertexShader: ShaderBuilder, fragmentShader: ShaderBuilder) {
         this.program = this.createProgram(vertexShader, fragmentShader);
         this.updateMesh();
-        console.log(this.attributeBuffers);
-    }
-
-    protected setUniform(name: string, ...value: number[]) {
-        this.program.setUniform(name, ...value);
     }
 
     protected updateMesh() {
-        // this isn't necessarily assignable to T, but that is the whole point of T so we will assume it here
-        this.meshBuilder.build(this as unknown as T);
+        this.meshBuilder.build(this);
+    }
 
-        // update the buffers
-        const entries = Object.entries(this.meshBuilder.attributeValues) as [TAttrs, BufferSource][];
-        for (const [key, value] of entries) {
-            this.updateBuffer(this.attributeBuffers[key], value, this.ctx[this.meshBuilder.attributeTypes[key]]);
-        }
+    getVariable<V extends Variable<T>, T>(from: VariableCreator<T>): V {
+        return from(this.ctx, this.variableCache) as V;
     }
 
     draw() {
         this.program.use();
 
+        const bindableVariables = Array.from(this.variableCache.values())
+            .filter(isBindable)
+            .map(v => isBindable(v) ? v : null);
+
+        bindableVariables.forEach(v => v.bind());
+
         const drawType = DrawerBase.getDrawType(this.ctx, this.meshBuilder.triMode);
         this.ctx.drawElements(drawType, this.meshBuilder.vertexCount, this.ctx.UNSIGNED_SHORT, 0);
+
+        bindableVariables.forEach(v => v.unbind());
     }
 }

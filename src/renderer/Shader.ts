@@ -1,86 +1,111 @@
+import Variable, {VariableCache, VariableCreator} from "./Variable";
+import KeysOfType from "../utils/KeysOfType";
+
 export class Shader {
+    private static format(source: string) {
+        const addIndentRegex = /[{(]/g,
+            removeIndentRegex = /[})]/g;
+
+        const lines = source.split("\n").map(l => l.trim());
+        const result: string[] = [];
+
+        let indent = 0, previousLine = "";
+        for (const line of lines) {
+            if (!line && !previousLine) continue;
+
+            const addIndentCount = line.match(addIndentRegex)?.length || 0;
+            const removeIndentCount = line.match(removeIndentRegex)?.length || 0;
+            const diff = addIndentCount - removeIndentCount;
+
+            if (diff < 0) indent += diff;
+            result.push(" ".repeat(Math.max(0, indent) * 4) + line);
+            if (diff > 0) indent += diff;
+
+            previousLine = line;
+        }
+
+        return result.join("\n");
+    }
+
     public readonly source: string;
+    public readonly variables: Variable<any>[];
 
-    public readonly attributes: Variable[];
-    public readonly uniforms: Variable[];
-
-    constructor(builder: ShaderBuilder) {
-        this.source = builder.result.join("");
-        this.attributes = builder.attributes;
-        this.uniforms = builder.uniforms;
+    constructor(builder: ShaderBuilder, ctx: WebGLRenderingContext, variableCache: VariableCache) {
+        builder.build(ctx, variableCache);
+        this.source = builder.getResult();
+        this.variables = builder.variables;
     }
 
     log() {
-        let indent = 0;
-        const lines = this.source.split("\n").slice(1, -1);
-
-        /*const firstLine = lines[0];
-        for (let i = 0; i < firstLine.length; i++) {
-            if (firstLine[i] !== " ") break;
-            indent++;
-        }*/
-
-        const unindentedLines = lines.map((l, i) => `${i + 1}. ${l.substring(indent)}`);
-        console.log(unindentedLines.join("\n"));
+        console.log(Shader.format(this.source));
     }
 }
 
-export type VariableType = "float" | "vec2" | "vec3" | "vec4";
-type Precision = "highp" | "mediump" | "lowp";
+export interface ShaderBuilder {
+    readonly variables: Variable<any>[];
 
-type AttributeInitOp = Parameters<typeof ShaderBuilder.prototype.runAttrOperation>;
-type UniformInitOp = Parameters<typeof ShaderBuilder.prototype.runUniformOperation>;
-type IncludeOp = Parameters<typeof ShaderBuilder.prototype.runInclude>;
+    // only available after build()
+    readonly ctx: WebGLRenderingContext;
+    readonly variableCache: VariableCache;
 
-type Operation = AttributeInitOp | UniformInitOp | IncludeOp;
-
-export interface Variable {
-    type: VariableType;
-    name: string;
+    build(ctx: WebGLRenderingContext, variableCache: VariableCache): void;
+    getResult(): string;
 }
 
-class ShaderBuilder {
+class OperationRunner {
+    constructor(private sb: ShaderBuilder) {}
+
+    var(_: "var", creator: VariableCreator<any>) {
+        const variable = creator(this.sb.ctx, this.sb.variableCache);
+        this.sb.variables.push(variable);
+        return variable.getCreator();
+    }
+
+    ref(_: "ref", creator: VariableCreator<any>) {
+        // running the creator again is not ideal, but there is a memo utility that they can use to make it faster
+        // (and to make sure it returns the same variable instance)
+        const variable = creator(this.sb.ctx, this.sb.variableCache);
+        return variable.getAccessor();
+    }
+
+    include(_: "include", shader: ShaderBuilder) {
+        shader.build(this.sb.ctx, this.sb.variableCache);
+        this.sb.variables.push(...shader.variables);
+        return shader.getResult();
+    }
+}
+
+type OpKeys = KeysOfType<typeof OperationRunner.prototype, Function>;
+type Operation = Parameters<{[key in OpKeys]: typeof OperationRunner.prototype[key]}[OpKeys]>;
+
+class ShaderBuilderImpl implements ShaderBuilder {
     private readonly strings: TemplateStringsArray;
     private readonly ops: (Operation | string)[];
+    private readonly opRunner: OperationRunner;
 
-    readonly result: string[] = [];
-
-    readonly attributes: Variable[] = [];
-    readonly uniforms: Variable[] = [];
+    // reset each build
+    private result: string[] = [];
+    ctx: WebGLRenderingContext;
+    variableCache: VariableCache;
+    variables: Variable<any>[];
 
     constructor(strings: TemplateStringsArray, opts: (Operation | string)[]) {
         this.strings = strings;
         this.ops = opts;
-    }
-
-    runAttrOperation(_: "attr", type: VariableType, name: string) {
-        this.attributes.push({type,  name});
-        return `attribute ${type} ${name}`;
-    }
-
-    runUniformOperation(_: "uniform", type: VariableType, name: string, precision?: Precision) {
-        this.uniforms.push({type, name});
-
-        if (precision) return `uniform ${precision} ${type} ${name}`;
-        return `uniform ${type} ${name}`;
-    }
-
-    runInclude(_: "include", value: Shader) {
-        this.attributes.push(...value.attributes);
-        this.uniforms.push(...value.uniforms);
-        return value.source;
+        this.opRunner = new OperationRunner(this);
     }
 
     runOperation(op: Operation) {
-        switch (op[0]) {
-            case "attr": return this.runAttrOperation(...op);
-            case "uniform": return this.runUniformOperation(...op);
-            case "include": return this.runInclude(...op);
-            default: throw new Error(`Unsupported operation "${op[0]}"`);
-        }
+        // @ts-ignore
+        return this.opRunner[op[0]](...op);
     }
 
-    createShader() {
+    build(ctx: WebGLRenderingContext, variableCache: VariableCache) {
+        this.result = [];
+        this.ctx = ctx;
+        this.variableCache = variableCache;
+        this.variables = [];
+
         for (let i = 0; i < this.ops.length; i++) {
             const str = this.strings[i];
             const op = this.ops[i];
@@ -92,12 +117,13 @@ class ShaderBuilder {
         }
 
         this.result.push(this.strings[this.ops.length]);
+    }
 
-        return new Shader(this);
+    getResult() {
+        return this.result.join("");
     }
 }
 
 export default function createShader(strings: TemplateStringsArray, ...ops: (Operation | string)[]) {
-    const builder = new ShaderBuilder(strings, ops);
-    return builder.createShader();
+    return new ShaderBuilderImpl(strings, ops);
 }

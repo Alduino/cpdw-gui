@@ -1,3 +1,5 @@
+import DrawerBase from "./DrawerBase";
+
 export enum MeshType {
     triangles,
     triangleFan,
@@ -20,23 +22,7 @@ export type PackedMesh<T extends string> = {
     [key in T]: BufferSource;
 };
 
-export default interface MeshBuilder<TKeys extends string, TParam> {
-    /**
-     * List of the mesh's attributes and their types. Must be set in constructor
-     */
-    readonly attributeTypes: MeshAttributes<TKeys>;
-
-    /**
-     * Maps attribute names to the names used in the shader.
-     * Multiple attributes can have the same name, all of these will be bound.
-     */
-    readonly attributeNames: AttributeNames<TKeys>;
-
-    /**
-     * List of values for each attribute. Should be set in each update
-     */
-    attributeValues: PackedMesh<TKeys>;
-
+export default interface MeshBuilder<T extends DrawerBase> {
     /**
      * The number of vertexes this mesh has
      */
@@ -50,5 +36,5 @@ export default interface MeshBuilder<TKeys extends string, TParam> {
     /**
      * Re-calculate the mesh, and fill out attributeValues
      */
-    build(param: TParam): void;
+    build(param: T): void;
 }

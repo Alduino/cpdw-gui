@@ -4,9 +4,9 @@ function hrTimeToMs(hrtime: [number, number] = process.hrtime()) {
     return hrtime[0] * 1000 + hrtime[1] / 1000000;
 }
 
-function nextFrame(cb: Function) {
+function nextFrame(win: WindowWrapper, cb: Function) {
     return new Promise<void>(yay => {
-        requestAnimationFrame(() => {
+        win.requestAnimationFrame(() => {
             cb();
             yay();
         });
@@ -19,7 +19,7 @@ export async function perFrame(win: WindowWrapper, fn: (delta: number, time: num
     let lastT = msFunction(), enabled = true;
 
     while (enabled && !win.closing) {
-        await nextFrame(() => {
+        await nextFrame(win, () => {
             const t = msFunction();
             lastT = t;
 

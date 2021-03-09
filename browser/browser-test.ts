@@ -1,5 +1,7 @@
 import "regenerator-runtime/runtime";
 import Vector2 from "@equinor/videx-vector2";
+// @ts-ignore
+import {Spector} from "spectorjs";
 import {BrowserWindow} from "../src/browser/BrowserWindow";
 import "./window.scss";
 import {test} from "../src/example/test-gl";
@@ -10,7 +12,9 @@ function moduleIsHot(module: any): module is Hot {
 }
 
 (async () => {
+
     const win = new BrowserWindow(document.body);
+
     win.open();
     win.title = `My new window (random:${Date.now() % 1000})`;
     win.size = new Vector2(800, 600);
@@ -30,6 +34,9 @@ function moduleIsHot(module: any): module is Hot {
             win.close();
         });
     }
+
+    const spector = new Spector();
+    spector.displayUI();
 
     test(win);
 })()

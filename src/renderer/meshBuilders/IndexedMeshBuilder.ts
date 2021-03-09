@@ -1,7 +1,7 @@
 import Vector2 from "@equinor/videx-vector2";
 import MeshBuilder, {AttributeNames, MeshAttributes, MeshType, PackedMesh} from "../MeshBuilder";
-
-export type IndexedMeshAttrs = "vertices" | "indices";
+import DrawerBase from "../DrawerBase";
+import {aVec2b} from "../variables/attribute/Vec2BufferAttributeVariable";
 
 export interface IndexedMesh {
     // defaults to the previous value, or triangles
@@ -14,20 +14,9 @@ export interface IndexedMesh {
     indices: number[];
 }
 
-export default class IndexedMeshBuilder<T> implements MeshBuilder<IndexedMeshAttrs, T> {
-    static readonly ATTR_COORDS = "coordinates";
+export default class IndexedMeshBuilder<T extends DrawerBase> implements MeshBuilder<T> {
+    static readonly ATTR_COORD = aVec2b("coordinates", {});
 
-    readonly attributeNames: AttributeNames<IndexedMeshAttrs> = {
-        vertices: [IndexedMeshBuilder.ATTR_COORDS],
-        indices: [IndexedMeshBuilder.ATTR_COORDS]
-    };
-
-    readonly attributeTypes: MeshAttributes<IndexedMeshAttrs> = {
-        vertices: "ARRAY_BUFFER",
-        indices: "ELEMENT_ARRAY_BUFFER"
-    };
-
-    attributeValues: PackedMesh<IndexedMeshAttrs>;
     vertexCount: number;
     triMode: MeshType = MeshType.triangles;
 
@@ -36,10 +25,10 @@ export default class IndexedMeshBuilder<T> implements MeshBuilder<IndexedMeshAtt
     build(param: T): void {
         const mesh = this.generate(param);
 
-        this.attributeValues = {
-            vertices: new Float32Array(mesh.vertices.flatMap(v => v.toArray())),
-            indices: new Uint16Array(mesh.indices)
-        };
+        param.getVariable(IndexedMeshBuilder.ATTR_COORD).set({
+            values: mesh.vertices,
+            indices: mesh.indices
+        });
 
         this.vertexCount = mesh.indices.length;
 

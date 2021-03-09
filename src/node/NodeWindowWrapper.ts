@@ -7,10 +7,16 @@ import {WindowWrapper} from "../WindowWrapper";
 NodeDocument.setWebgl(webgl);
 
 export class NodeWindowWrapper extends EventEmitter implements WindowWrapper {
+    private initEventListeners() {
+        this.window.on("resize", ({width, height}) => this.emit("resize", new Vector2(width, height)));
+
+        this.on("resize", size => this.ctx.viewport(0, 0, size.x, size.y));
+    }
+
     constructor(private window: NodeDocument) {
         super();
-
         this.ctx = webgl;
+        this.initEventListeners();
     }
 
     readonly ctx: WebGLRenderingContext;
