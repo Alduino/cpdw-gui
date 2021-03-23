@@ -4,7 +4,7 @@ import createShader from "../Shader";
 import ColouredIndexedMeshBuilder, {Colour} from "../meshBuilders/ColouredIndexedMeshBuilder";
 import {transformShader, UNIFORM_OFFSET, UNIFORM_SCALE, UNIFORM_VIEWPORT_SIZE} from "../util/transform";
 
-export default class Button extends DrawerBase {
+export default class Rectangle extends DrawerBase {
     // language=GLSL
     private static vertexShader = createShader`
         precision mediump float;
@@ -36,7 +36,7 @@ export default class Button extends DrawerBase {
         }
     `;
 
-    private static meshBuilder = new ColouredIndexedMeshBuilder<Button>(p => {
+    private static meshBuilder = new ColouredIndexedMeshBuilder<Rectangle>(p => {
         // second number is the id of the part of the shape
         // 1=border, 0=inner
         const borderColour: Colour = [.45, .45, .45, 1];
@@ -95,8 +95,8 @@ export default class Button extends DrawerBase {
     private _size = new Vector2(120, 16 * 3);
 
     constructor(ctx: WebGLRenderingContext) {
-        super(ctx, Button.meshBuilder);
-        this.init(Button.vertexShader, Button.fragmentShader);
+        super(ctx, Rectangle.meshBuilder);
+        this.init(Rectangle.vertexShader, Rectangle.fragmentShader);
 
         this.scale = new Vector2(1);
     }
