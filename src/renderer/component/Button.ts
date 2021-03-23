@@ -42,10 +42,10 @@ export default class Button extends DrawerBase {
         const borderColour: Colour = [.45, .45, .45, 1];
         const innerColour: Colour = [.95, .95, .95, 0];
 
-        const left = -p.size.x / 2;
-        const right = p.size.x / 2;
-        const top = -p.size.y / 2;
-        const bottom = p.size.y / 2;
+        const left = 0;
+        const right = p.size.x;
+        const top = 0;
+        const bottom = p.size.y;
 
         return ({
             vertices: [
