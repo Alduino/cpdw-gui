@@ -8,18 +8,18 @@ export default class Button extends DrawerBase {
     // language=GLSL
     private static vertexShader = createShader`
         precision mediump float;
-        
+
         ${["include", transformShader]}
-        
+
         ${["var", ColouredIndexedMeshBuilder.ATTR_COORD]};
         ${["var", ColouredIndexedMeshBuilder.ATTR_COLOUR]};
-        
+
         varying vec4 displayColour;
 
         void main() {
-            displayColour = ${["ref", ColouredIndexedMeshBuilder.ATTR_COLOUR]};
+            displayColour = ${ColouredIndexedMeshBuilder.ATTR_COLOUR};
             gl_Position = vec4(
-                transform(${["ref", ColouredIndexedMeshBuilder.ATTR_COORD]}),
+                transform(${ColouredIndexedMeshBuilder.ATTR_COORD}),
                 0., 1.
             );
         }
@@ -30,7 +30,7 @@ export default class Button extends DrawerBase {
         precision mediump float;
 
         varying vec4 displayColour;
-        
+
         void main() {
             gl_FragColor = displayColour;
         }
