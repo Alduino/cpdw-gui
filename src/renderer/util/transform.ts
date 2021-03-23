@@ -16,8 +16,8 @@ export const transformShader = createShader`
     ${["var", UNIFORM_VIEWPORT_SIZE]};
 
     vec2 transform(vec2 p) {
-        vec2 targetPos = p * ${["ref", UNIFORM_SCALE]} + ${["ref", UNIFORM_OFFSET]};
-        vec2 mapped = targetPos / ${["ref", UNIFORM_VIEWPORT_SIZE]} - vec2(1, -1);
+        vec2 targetPos = p * ${UNIFORM_SCALE} + ${UNIFORM_OFFSET};
+        vec2 mapped = targetPos / ${UNIFORM_VIEWPORT_SIZE} - vec2(1, -1);
         return mapped;
     }
 `;

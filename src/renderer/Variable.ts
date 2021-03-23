@@ -1,5 +1,23 @@
 export type VariableCache = Map<string, Variable<any>>;
-export type VariableCreator<T> = (ctx: WebGLRenderingContext, cache: VariableCache) => Variable<T>;
+
+export abstract class VariableCreator<T> {
+    static isVariableCreator<T>(src: any): src is VariableCreator<T> {
+        return src instanceof VariableCreator;
+    }
+
+    protected abstract createVariable(ctx: WebGLRenderingContext): Variable<T>;
+
+    protected constructor(protected name: string) {}
+
+    create(ctx: WebGLRenderingContext, cache: VariableCache): Variable<T> {
+        const key = this.constructor.name + "||" + this.name;
+        if (cache.has(key)) return cache.get(key);
+
+        const variable = this.createVariable(ctx);
+        cache.set(key, variable);
+        return variable;
+    }
+}
 
 export type Precision = "highp" | "mediump" | "lowp";
 

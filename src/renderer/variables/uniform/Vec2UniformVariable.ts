@@ -1,7 +1,6 @@
 import UniformVariable from "./UniformVariable";
 import Vector2 from "@equinor/videx-vector2";
-import {Precision, VariableCreator} from "../../Variable";
-import memoVc from "../utils/memoVc";
+import Variable, {Precision, VariableCreator} from "../../Variable";
 
 export default class Vec2UniformVariable extends UniformVariable<Vector2> {
     protected getPrecisionKeyword(): Precision {
@@ -21,6 +20,16 @@ export default class Vec2UniformVariable extends UniformVariable<Vector2> {
     }
 }
 
+class UVec2Creator extends VariableCreator<Vector2> {
+    constructor(name: string, private precision?: Precision) {
+        super(name);
+    }
+
+    protected createVariable(ctx: WebGLRenderingContext): Variable<Vector2> {
+        return new Vec2UniformVariable(ctx, this.name, this.precision);
+    }
+}
+
 export function uVec2(name: string, precision?: Precision): VariableCreator<Vector2> {
-    return memoVc(uVec2, name, ctx => new Vec2UniformVariable(ctx, name, precision));
+    return new UVec2Creator(name, precision);
 }

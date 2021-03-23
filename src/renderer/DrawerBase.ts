@@ -56,7 +56,7 @@ export default abstract class DrawerBase implements Drawer {
     }
 
     getVariable<V extends Variable<T>, T>(from: VariableCreator<T>): V {
-        return from(this.ctx, this.variableCache) as V;
+        return from.create(this.ctx, this.variableCache) as V;
     }
 
     draw() {
