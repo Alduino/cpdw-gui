@@ -331,11 +331,14 @@ export class BrowserWindow extends EventEmitter implements WindowWrapper {
     set size(val) {
         if (this.maximised) this.restore();
 
-        this.innerContainer.style.width = `${Math.max(70, val.x)}px`;
-        this.innerContainer.style.height = `${Math.max(this.titleBar.offsetHeight + 5, val.y)}px`;
+        const clampedWidth = Math.max(70, val.x);
+        const clampedHeight = Math.max(this.titleBar.offsetHeight + 15, val.y);
 
-        this.canvas.width = val.x;
-        this.canvas.height = val.y - this.titleBar.offsetHeight;
+        this.innerContainer.style.width = `${clampedWidth}px`;
+        this.innerContainer.style.height = `${clampedHeight}px`;
+
+        this.canvas.width = clampedWidth;
+        this.canvas.height = clampedHeight - this.titleBar.offsetHeight;
 
         this.emit("resize", this.drawSize);
     }
