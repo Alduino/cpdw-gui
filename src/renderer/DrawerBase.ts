@@ -3,7 +3,7 @@ import {ShaderBuilder} from "./Shader";
 import Program from "./Program";
 import MeshBuilder, {MeshType} from "./MeshBuilder";
 import Variable, {VariableCache, VariableCreator} from "./Variable";
-import Bindable, {isBindable} from "./variables/Bindable";
+import {isBindable} from "./variables/Bindable";
 
 export default abstract class DrawerBase implements Drawer {
     private static getDrawType(ctx: WebGLRenderingContext, from: MeshType) {
@@ -22,8 +22,11 @@ export default abstract class DrawerBase implements Drawer {
     private readonly ctx: WebGLRenderingContext;
     private program: Program;
 
+    private static uniqueNameIncr = 0;
+    private uniqueName = `${this.constructor.name}_${(++DrawerBase.uniqueNameIncr).toString(16)}`
+
     private createProgram(vs: ShaderBuilder, fs: ShaderBuilder) {
-        const program = new Program(this.ctx, vs, fs);
+        const program = new Program(this.ctx, vs, fs, this.uniqueName);
         program.createProgram(this.variableCache);
 
         return program;
@@ -56,7 +59,7 @@ export default abstract class DrawerBase implements Drawer {
     }
 
     getVariable<V extends Variable<T>, T>(from: VariableCreator<T>): V {
-        return from.create(this.ctx, this.variableCache) as V;
+        return from.create(this.ctx, this.uniqueName, this.variableCache) as V;
     }
 
     draw() {

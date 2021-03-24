@@ -9,11 +9,12 @@ export abstract class VariableCreator<T> {
 
     protected constructor(protected name: string) {}
 
-    create(ctx: WebGLRenderingContext, cache: VariableCache): Variable<T> {
+    create(ctx: WebGLRenderingContext, programName: string, cache: VariableCache): Variable<T> {
         const key = this.constructor.name + "||" + this.name;
         if (cache.has(key)) return cache.get(key);
 
         const variable = this.createVariable(ctx);
+        variable.setProgramName(programName);
         cache.set(key, variable);
         return variable;
     }
@@ -29,10 +30,11 @@ export abstract class VariableLocator<T> {
 export default abstract class Variable<T> {
     private locator: VariableLocator<any>;
     private program: WebGLProgram;
+    private programName: string;
 
     private getName() {
         // try to reduce the chance of collisions
-        return `_var_${this.constructor.name}_${this.name}`;
+        return `_cpdwvar_${this.programName}_${this.name}`;
     }
 
     protected onProgramSet: (() => void)[] = [];
@@ -64,6 +66,10 @@ export default abstract class Variable<T> {
         private name: string
     ) {}
 
+    setProgramName(name: string) {
+        this.programName = name;
+    }
+
     getCreator(): string {
         const res: string[] = [];
 
@@ -79,9 +85,10 @@ export default abstract class Variable<T> {
         return this.getName();
     }
 
-    loadProgram(program: WebGLProgram) {
+    loadProgram(program: WebGLProgram, programName: string) {
         this.program = program;
         this.locator = this.createLocator(program);
+        this.programName = programName;
         this.onProgramSet.forEach(v => v());
     }
 

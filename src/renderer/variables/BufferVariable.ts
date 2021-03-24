@@ -21,16 +21,17 @@ export default abstract class BufferVariable<T> extends Variable<BufferValue<T>>
     protected abstract setUpPtr(location: number, buffer: WebGLBuffer): void;
 
     private init() {
-        console.log("Init for", this.getAccessor());
-
         const location = this.getLocation();
         if (location === null || location === -1) return;
 
         this.valueBuffer = this.ctx.createBuffer();
         this.indexBuffer = this.ctx.createBuffer();
 
+        this.ctx.getExtension("GMAN_debug_helper")?.tagObject(this.valueBuffer, this.getAccessor() + ":value");
+        this.ctx.getExtension("GMAN_debug_helper")?.tagObject(this.indexBuffer, this.getAccessor() + ":index");
+
+        // call bind to set up
         this.bind();
-        this.setUpPtr(location, this.valueBuffer);
         this.unbind();
     }
 
@@ -47,6 +48,7 @@ export default abstract class BufferVariable<T> extends Variable<BufferValue<T>>
     }
 
     set(value: BufferValue<T>) {
+        console.log("set", this.getAccessor());
         const packedValues = this.pack(value.values);
         const packedIndices = BufferVariable.packIndices(value.indices);
 
@@ -64,6 +66,9 @@ export default abstract class BufferVariable<T> extends Variable<BufferValue<T>>
     bind() {
         this.ctx.bindBuffer(this.ctx.ARRAY_BUFFER, this.valueBuffer);
         this.ctx.bindBuffer(this.ctx.ELEMENT_ARRAY_BUFFER, this.indexBuffer);
+
+        // and bind the vertex attrib array
+        this.setUpPtr(this.getLocation(), this.valueBuffer);
     }
 
     unbind() {

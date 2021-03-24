@@ -1,5 +1,5 @@
 import Vector2 from "@equinor/videx-vector2";
-import MeshBuilder, {AttributeNames, MeshAttributes, MeshType, PackedMesh} from "../MeshBuilder";
+import MeshBuilder, {MeshType} from "../MeshBuilder";
 import DrawerBase from "../DrawerBase";
 import {aVec2b} from "../variables/attribute/Vec2BufferAttributeVariable";
 
@@ -15,7 +15,7 @@ export interface IndexedMesh {
 }
 
 export default class IndexedMeshBuilder<T extends DrawerBase> implements MeshBuilder<T> {
-    static readonly ATTR_COORD = aVec2b("coordinates", {});
+    static readonly ATTR_COORD = aVec2b("meshCoord", {});
 
     vertexCount: number;
     triMode: MeshType = MeshType.triangles;

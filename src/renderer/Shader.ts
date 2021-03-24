@@ -30,8 +30,8 @@ export class Shader {
     public readonly source: string;
     public readonly variables: Variable<any>[];
 
-    constructor(builder: ShaderBuilder, ctx: WebGLRenderingContext, variableCache: VariableCache) {
-        builder.build(ctx, variableCache);
+    constructor(builder: ShaderBuilder, ctx: WebGLRenderingContext, programName: string, variableCache: VariableCache) {
+        builder.build(ctx, programName, variableCache);
         this.source = builder.getResult();
         this.variables = builder.variables;
     }
@@ -47,8 +47,9 @@ export interface ShaderBuilder {
     // only available after build()
     readonly ctx: WebGLRenderingContext;
     readonly variableCache: VariableCache;
+    readonly programName: string;
 
-    build(ctx: WebGLRenderingContext, variableCache: VariableCache): void;
+    build(ctx: WebGLRenderingContext, programName: string, variableCache: VariableCache): void;
 
     getResult(): string;
 }
@@ -58,7 +59,7 @@ class OperationRunner {
     }
 
     var(_: "var", creator: VariableCreator<any>) {
-        const variable = creator.create(this.sb.ctx, this.sb.variableCache);
+        const variable = creator.create(this.sb.ctx, this.sb.programName, this.sb.variableCache);
         this.sb.variables.push(variable);
         return variable.getCreator();
     }
@@ -66,12 +67,12 @@ class OperationRunner {
     ref(_: "ref", creator: VariableCreator<any>) {
         // running the creator again is not ideal, but there is a memo utility that they can use to make it faster
         // (and to make sure it returns the same variable instance)
-        const variable = creator.create(this.sb.ctx, this.sb.variableCache);
+        const variable = creator.create(this.sb.ctx, this.sb.programName, this.sb.variableCache);
         return variable.getAccessor();
     }
 
     include(_: "include", shader: ShaderBuilder) {
-        shader.build(this.sb.ctx, this.sb.variableCache);
+        shader.build(this.sb.ctx, this.sb.programName, this.sb.variableCache);
         this.sb.variables.push(...shader.variables);
         return shader.getResult();
     }
@@ -90,6 +91,7 @@ class ShaderBuilderImpl implements ShaderBuilder {
     ctx: WebGLRenderingContext;
     variableCache: VariableCache;
     variables: Variable<any>[];
+    programName: string;
 
     constructor(strings: TemplateStringsArray, opts: (Operation | VariableCreator<unknown> | string)[]) {
         this.strings = strings;
@@ -102,11 +104,12 @@ class ShaderBuilderImpl implements ShaderBuilder {
         return this.opRunner[op[0]](...op);
     }
 
-    build(ctx: WebGLRenderingContext, variableCache: VariableCache) {
+    build(ctx: WebGLRenderingContext, programName: string, variableCache: VariableCache) {
         this.result = [];
         this.ctx = ctx;
         this.variableCache = variableCache;
         this.variables = [];
+        this.programName = programName;
 
         for (let i = 0; i < this.ops.length; i++) {
             const str = this.strings[i];

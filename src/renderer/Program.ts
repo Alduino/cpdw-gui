@@ -7,10 +7,11 @@ export default class Program {
     constructor(
         private readonly ctx: WebGLRenderingContext,
         private readonly vs: ShaderBuilder,
-        private readonly fs: ShaderBuilder) {}
+        private readonly fs: ShaderBuilder,
+        private readonly name: string) {}
 
     private loadShader(type: GLenum, source: ShaderBuilder, variableCache: VariableCache) {
-        const shaderSource = new Shader(source, this.ctx, variableCache);
+        const shaderSource = new Shader(source, this.ctx, this.name, variableCache);
 
         const shader = this.ctx.createShader(type);
         this.ctx.shaderSource(shader, shaderSource.source);
@@ -31,6 +32,7 @@ export default class Program {
         const fragmentShader = this.loadShader(this.ctx.FRAGMENT_SHADER, this.fs, variableCache);
 
         const program = this.ctx.createProgram();
+        this.ctx.getExtension("GMAN_debug_helper")?.tagObject(program, this.name);
 
         this.ctx.attachShader(program, vertexShader);
         this.ctx.attachShader(program, fragmentShader);
@@ -47,7 +49,7 @@ export default class Program {
         this.program = program;
 
         // pass the program to each variable
-        Array.from(variableCache.values()).forEach(v => v.loadProgram(this.program));
+        Array.from(variableCache.values()).forEach(v => v.loadProgram(this.program, this.name));
     }
 
     use() {

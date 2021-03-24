@@ -11,8 +11,8 @@ export default abstract class BufferAttributeVariable<T> extends BufferVariable<
     }
 
     protected setUpPtr(location: number, buffer: WebGLBuffer): void {
-        this.ctx.vertexAttribPointer(location, this.getSize(), this.getType(), false, 0, 0);
         this.ctx.enableVertexAttribArray(location);
+        this.ctx.vertexAttribPointer(location, this.getSize(), this.getType(), false, 0, 0);
     }
 
     protected constructor(

@@ -2,8 +2,7 @@ import BufferAttributeVariable from "./BufferAttributeVariable";
 import Variable, {Precision, VariableCreator} from "../../Variable";
 import KeysOfType from "../../../utils/KeysOfType";
 import {BufferValue} from "../BufferVariable";
-
-export type Vec4 = [number, number, number, number];
+import {Vec4} from "../../util/Vec4";
 
 export default class Vec4BufferAttributeVariable extends BufferAttributeVariable<Vec4> {
     constructor(
