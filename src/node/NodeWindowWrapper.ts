@@ -16,6 +16,8 @@ export class NodeWindowWrapper extends EventEmitter implements WindowWrapper {
     constructor(private window: NodeDocument) {
         super();
         this.ctx = webgl;
+        webgl.enable(webgl.BLEND);
+        webgl.blendFunc(webgl.SRC_ALPHA, webgl.ONE_MINUS_SRC_ALPHA);
         this.initEventListeners();
     }
 
