@@ -98,7 +98,8 @@ export default class Rectangle extends DrawerBase {
         super(ctx, Rectangle.meshBuilder);
         this.init(Rectangle.vertexShader, Rectangle.fragmentShader);
 
-        this.scale = new Vector2(1);
+        this.scale = Vector2.one;
+        this.position = Vector2.zero;
     }
 
     handleResize(size: Vector2) {
