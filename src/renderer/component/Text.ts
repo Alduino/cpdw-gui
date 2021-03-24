@@ -6,7 +6,7 @@ import {tex2d} from "../variables/texture/ImageTexture2dVariable";
 import Vector2 from "@equinor/videx-vector2";
 import {MeshType} from "../MeshBuilder";
 import {Vec4} from "../util/Vec4";
-import fontFile from "url:./fonts/EkMukta-Regular.png";
+import fontImage from "./fonts/EkMukta-Regular.b64";
 import fontInfoFile from "./fonts/EkMukta-Regular.json";
 import Font from "./fonts/font";
 import UvIndexedMeshBuilder from "../meshBuilders/UvIndexedMeshBuilder";
@@ -129,7 +129,7 @@ export default class Text extends DrawerBase {
         this.init(Text.vertexShader, Text.fragmentShader);
         this.scale = new Vector2(1);
 
-        this.getVariable(Text.TEX2D_MAP).set(fontFile);
+        this.getVariable(Text.TEX2D_MAP).set(fontImage);
     }
 
     handleResize(size: Vector2) {

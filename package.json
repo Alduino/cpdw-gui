@@ -8,6 +8,8 @@
 	},
 	"dependencies": {
 		"@equinor/videx-vector2": "^1.0.44",
+		"@pdf-lib/upng": "^1.0.1",
+		"base64-arraybuffer": "^0.2.0",
 		"glfw-raub": "^4.5.0",
 		"regenerator-runtime": "^0.13.7",
 		"spectorjs": "^0.9.22",
@@ -15,6 +17,7 @@
 	},
 	"devDependencies": {
 		"@babel/core": "^7.12.10",
+		"@parcel/transformer-sass": "2.0.0-beta.2",
 		"@types/color": "^3.0.1",
 		"@types/node": "^14.14.32",
 		"nodemon": "^2.0.6",

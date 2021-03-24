@@ -1,6 +1,7 @@
 import Variable, {Precision, VariableCreator, VariableLocator} from "../../Variable";
 import Bindable, {bindableSymbol} from "../Bindable";
 import Vector2 from "@equinor/videx-vector2";
+import UPNG from "@pdf-lib/upng";
 
 class NoopLocator extends VariableLocator<any> {
     getLocation(name: string): any {
@@ -12,7 +13,7 @@ class NoopLocator extends VariableLocator<any> {
     }
 }
 
-export default class ImageTexture2dVariable extends Variable<string> implements Bindable {
+export default class ImageTexture2dVariable extends Variable<ArrayBuffer> implements Bindable {
     [bindableSymbol]: true;
     private readonly texture: WebGLTexture;
 
@@ -23,7 +24,7 @@ export default class ImageTexture2dVariable extends Variable<string> implements 
         this.setData(new Uint8Array([255, 0, 255, 255]), new Vector2(1, 1));
     }
 
-    set(value: string): void {
+    set(value: ArrayBuffer): void {
         this.load(value);
     }
 
@@ -65,32 +66,37 @@ export default class ImageTexture2dVariable extends Variable<string> implements 
         this.ctx.texImage2D(this.ctx.TEXTURE_2D, 0,
             this.ctx.RGBA, this.ctx.RGBA, this.ctx.UNSIGNED_BYTE,
             image);
+    }
+
+    private setOptions() {
         this.ctx.texParameteri(this.ctx.TEXTURE_2D, this.ctx.TEXTURE_WRAP_S, this.ctx.CLAMP_TO_EDGE);
         this.ctx.texParameteri(this.ctx.TEXTURE_2D, this.ctx.TEXTURE_WRAP_T, this.ctx.CLAMP_TO_EDGE);
         this.ctx.texParameteri(this.ctx.TEXTURE_2D, this.ctx.TEXTURE_MIN_FILTER, this.ctx.LINEAR);
     }
 
-    private load(path: string) {
+    private load(source: ArrayBuffer) {
         // fill with loading colour while loading
         this.setData(new Uint8Array([255, 0, 255, 255]), new Vector2(1, 1));
-
-        // load the new image
-        const image = new Image();
-        image.onload = () => this.setImage(image);
-        image.src = path;
+        this.setOptions();
+        const image = UPNG.decode(source);
+        const rgba8 = UPNG.toRGBA8(image);
+        if (rgba8.length !== 1) throw new Error("Image must be a PNG file with one frame");
+        const [firstImage] = rgba8;
+        this.setData(new Uint8Array(firstImage), new Vector2(image.width, image.height));
+        this.setOptions();
     }
 }
 
-class Tex2dCreator extends VariableCreator<string> {
+class Tex2dCreator extends VariableCreator<ArrayBuffer> {
     constructor(name: string) {
         super(name);
     }
 
-    protected createVariable(ctx: WebGLRenderingContext): Variable<string> {
+    protected createVariable(ctx: WebGLRenderingContext): Variable<ArrayBuffer> {
         return new ImageTexture2dVariable(ctx, this.name);
     }
 }
 
-export function tex2d(name: string): VariableCreator<string> {
+export function tex2d(name: string): VariableCreator<ArrayBuffer> {
     return new Tex2dCreator(name);
 }
