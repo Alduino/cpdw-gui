@@ -249,6 +249,8 @@ export class BrowserWindow extends EventEmitter implements WindowWrapper {
             alpha: false,
             ...glAttrs
         });
+        this.context.enable(this.context.BLEND);
+        this.context.blendFunc(this.context.SRC_ALPHA, this.context.ONE_MINUS_SRC_ALPHA);
         this.lastGlAttrs = glAttrs;
 
         const linkMouseEvent = (name: string) => {

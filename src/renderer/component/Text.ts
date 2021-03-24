@@ -59,9 +59,7 @@ export default class Text extends DrawerBase {
             vec4 src = 1. - texture2D(${Text.TEX2D_MAP}, uv);
             float dist = median(src.r, src.g, src.b) - .5;
             float alpha = clamp(dist / fwidth(dist) + .5, 0., 1.);
-            gl_FragColor = ${Text.UNIFORM_COLOUR};
-            //if (alpha < .0001) discard;
-            gl_FragColor = mix(vec4(1.), gl_FragColor, alpha);
+            gl_FragColor = ${Text.UNIFORM_COLOUR} * alpha;
         }
     `;
 
