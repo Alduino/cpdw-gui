@@ -76,6 +76,12 @@ class OperationRunner {
         this.sb.variables.push(...shader.variables);
         return shader.getResult();
     }
+
+    extension(_: "extension", name: string) {
+        console.log("Enabling extension", name);
+        this.sb.ctx.getExtension(name);
+        return `# extension GL_${name} : enable`;
+    }
 }
 
 type OpKeys = KeysOfType<typeof OperationRunner.prototype, Function>;
