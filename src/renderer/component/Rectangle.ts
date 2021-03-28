@@ -37,10 +37,8 @@ export default class Rectangle extends DrawerBase {
     `;
 
     private static meshBuilder = new ColouredIndexedMeshBuilder<Rectangle>(p => {
-        // second number is the id of the part of the shape
-        // 1=border, 0=inner
-        const borderColour: Colour = [.45, .45, .45, 1];
-        const innerColour: Colour = [.95, .95, .95, 0];
+        const borderColour: Colour = [...p.borderColour, 1];
+        const innerColour: Colour = [...p.fill, 1];
 
         const left = 0;
         const right = p.size.x;
@@ -91,6 +89,8 @@ export default class Rectangle extends DrawerBase {
         });
     });
 
+    private _fill: [number, number, number] = [255, 255, 255];
+    private _borderColour: [number, number, number] = [0, 0, 0];
     private _borderSize = new Vector2(1);
     private _size = new Vector2(50, 50);
 
@@ -109,6 +109,26 @@ export default class Rectangle extends DrawerBase {
     set scale(v: Vector2) { this.getVariable(UNIFORM_SCALE).set(v); }
     set position(v: Vector2) { this.getVariable(UNIFORM_OFFSET).set(v); }
 
+    get fill() {
+        return this._fill;
+    }
+
+    // @mesh-update
+    set fill(v) {
+        this._fill = v;
+        this.updateMesh();
+    }
+
+    get borderColour() {
+        return this._borderColour;
+    }
+
+    // @mesh-update
+    set borderColour(v) {
+        this._borderColour = v;
+        this.updateMesh();
+    }
+
     get borderSize() {
         return this._borderSize;
     }
@@ -123,6 +143,7 @@ export default class Rectangle extends DrawerBase {
         return this._size;
     }
 
+    // @mesh-update
     set size(v) {
         this._size = v;
         this.updateMesh();
