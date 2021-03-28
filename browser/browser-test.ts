@@ -1,6 +1,5 @@
 import "regenerator-runtime/runtime";
 import Vector2 from "@equinor/videx-vector2";
-// @ts-ignore
 import {Spector} from "spectorjs";
 import {BrowserWindow} from "../src/browser/BrowserWindow";
 import "./window.scss";
@@ -35,8 +34,11 @@ function moduleIsHot(module: any): module is Hot {
         });
     }
 
-    const spector = new Spector();
-    spector.displayUI();
+    document.getElementById("enable-spector").onclick = ev => {
+        (ev.currentTarget as HTMLButtonElement).disabled = true;
+        const spector = new Spector();
+        spector.displayUI();
+    };
 
     test(win);
 })()
