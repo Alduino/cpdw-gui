@@ -1,5 +1,5 @@
 import Vector2 from "@equinor/videx-vector2";
-import {EventEmitter} from "events";
+import EventEmitter from "events";
 import {WindowWrapper} from "../WindowWrapper";
 
 interface MoveCompatibleMouseEvent {
