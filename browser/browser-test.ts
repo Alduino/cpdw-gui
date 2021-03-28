@@ -19,12 +19,6 @@ function moduleIsHot(module: any): module is Hot {
     win.size = new Vector2(800, 600);
     win.pos = new Vector2(640, 10);
 
-    // @ts-ignore
-    win.on("mousedown", e => {
-        e.preventDefault();
-        win.beginWindowMovement(e);
-    });
-
     if (moduleIsHot(module)) {
         module.hot.accept();
 

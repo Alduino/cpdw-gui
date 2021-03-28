@@ -140,7 +140,7 @@ export class BrowserWindow extends EventEmitter implements WindowWrapper {
      * @param e - The event that triggered this action.
      * @param target - Target element to attach listeners to. Usually should be the canvas
      */
-    beginWindowMovement(e: MoveCompatibleMouseEvent, target: HTMLElement = this.canvas) {
+    beginWindowMovement(e: MoveCompatibleMouseEvent, target: HTMLElement = this.titleBar) {
         const startMoving = () => {
             clearTimeout(timeout);
             target.removeEventListener("mouseup", handleMouseUp);
