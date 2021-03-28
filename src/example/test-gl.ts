@@ -8,15 +8,19 @@ export function test(win: WindowWrapper) {
     const button = new Rectangle(win.ctx);
     const label = new Text(win.ctx);
 
-    button.size = new Vector2(73, 21);
-    button.position = new Vector2(10);
-    button.fill = [.9, .9, .9];
-    button.borderColour = [.7, .7, .7];
+    button.with(b => {
+        b.size = new Vector2(73, 21);
+        b.position = new Vector2(10);
+        b.fill = [.9, .9, .9];
+        b.borderColour = [.7, .7, .7];
+    });
 
-    label.scale = new Vector2(9);
-    label.position = new Vector2(10).add(14, 3);
-    label.colour = [0, 0, 0, 1];
-    label.text = "button6";
+    label.with(l => {
+        l.scale = new Vector2(9);
+        l.position = new Vector2(24, 13);
+        l.colour = [0, 0, 0, 1];
+        l.text = "button6";
+    })
 
     win.on("resize", button.handleResize.bind(button));
     win.on("resize", label.handleResize.bind(label));

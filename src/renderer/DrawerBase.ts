@@ -54,12 +54,26 @@ export default abstract class DrawerBase implements Drawer {
         this.updateMesh();
     }
 
+    private disableMeshUpdate = false;
     protected updateMesh() {
+        if (this.disableMeshUpdate) return;
         this.meshBuilder.build(this);
     }
 
     getVariable<V extends Variable<T>, T>(from: VariableCreator<T>): V {
         return from.create(this.ctx, this.uniqueName, this.variableCache) as V;
+    }
+
+    /**
+     * Allows setting multiple properties that would update the mesh, with only one mesh update at the end
+     * @param withExpr - Update the properties in this callback
+     */
+    with(withExpr: (setters: this) => void) {
+        this.disableMeshUpdate = true;
+        withExpr(this);
+        this.disableMeshUpdate = false;
+
+        this.updateMesh();
     }
 
     draw() {
