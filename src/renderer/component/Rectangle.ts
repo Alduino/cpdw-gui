@@ -91,8 +91,8 @@ export default class Rectangle extends DrawerBase {
         });
     });
 
-    private _borderSize = new Vector2(5);
-    private _size = new Vector2(120, 16 * 3);
+    private _borderSize = new Vector2(1);
+    private _size = new Vector2(50, 50);
 
     constructor(ctx: WebGLRenderingContext) {
         super(ctx, Rectangle.meshBuilder);
