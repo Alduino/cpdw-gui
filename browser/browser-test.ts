@@ -1,5 +1,6 @@
 import "regenerator-runtime/runtime";
 import Vector2 from "@equinor/videx-vector2";
+// @ts-ignore
 import {Spector} from "spectorjs";
 import {BrowserWindow} from "../src/browser/BrowserWindow";
 import "./window.scss";
