@@ -2,9 +2,9 @@ import Vector2 from "@equinor/videx-vector2";
 import DrawerBase from "../DrawerBase";
 import createShader from "../Shader";
 import ColouredIndexedMeshBuilder, {Colour} from "../meshBuilders/ColouredIndexedMeshBuilder";
-import {transformShader, UNIFORM_OFFSET, UNIFORM_SCALE, UNIFORM_VIEWPORT_SIZE} from "../util/transform";
+import {Transformable, TransformMixin, transformShader} from "../util/transform";
 
-export default class Rectangle extends DrawerBase {
+export default class Rectangle extends DrawerBase implements Transformable {
     // language=GLSL
     private static vertexShader = createShader`
         precision mediump float;
@@ -94,20 +94,14 @@ export default class Rectangle extends DrawerBase {
     private _borderSize = new Vector2(1);
     private _size = new Vector2(50, 50);
 
+    public readonly transform: TransformMixin;
+
     constructor(ctx: WebGLRenderingContext) {
         super(ctx, Rectangle.meshBuilder);
         this.init(Rectangle.vertexShader, Rectangle.fragmentShader);
 
-        this.scale = Vector2.one;
-        this.position = Vector2.zero;
+        this.transform = new TransformMixin(this);
     }
-
-    handleResize(size: Vector2) {
-        this.getVariable(UNIFORM_VIEWPORT_SIZE).set(size);
-    }
-
-    set scale(v: Vector2) { this.getVariable(UNIFORM_SCALE).set(v); }
-    set position(v: Vector2) { this.getVariable(UNIFORM_OFFSET).set(v); }
 
     get fill() {
         return this._fill;

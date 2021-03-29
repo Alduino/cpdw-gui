@@ -1,7 +1,7 @@
 import DrawerBase from "../DrawerBase";
 import createShader from "../Shader";
 import {uVec4} from "../variables/uniform/Vec4UniformVariable";
-import {transformShader, UNIFORM_OFFSET, UNIFORM_SCALE, UNIFORM_VIEWPORT_SIZE} from "../util/transform";
+import {Transformable, TransformMixin, transformShader} from "../util/transform";
 import {tex2d} from "../variables/texture/ImageTexture2dVariable";
 import Vector2 from "@equinor/videx-vector2";
 import {MeshType} from "../MeshBuilder";
@@ -13,7 +13,7 @@ import UvIndexedMeshBuilder from "../meshBuilders/UvIndexedMeshBuilder";
 
 const fontInfo = fontInfoFile as Font;
 
-export default class Text extends DrawerBase {
+export default class Text extends DrawerBase implements Transformable {
     private static UNIFORM_COLOUR = uVec4("colour");
     private static TEX2D_MAP = tex2d("map");
 
@@ -124,20 +124,16 @@ export default class Text extends DrawerBase {
         };
     });
 
+    public readonly transform: TransformMixin;
+
     constructor(ctx: WebGLRenderingContext) {
         super(ctx, Text.meshBuilder);
         this.init(Text.vertexShader, Text.fragmentShader);
-        this.scale = new Vector2(1);
+
+        this.transform = new TransformMixin(this);
 
         this.getVariable(Text.TEX2D_MAP).set(fontImage);
     }
-
-    handleResize(size: Vector2) {
-        this.getVariable(UNIFORM_VIEWPORT_SIZE).set(size);
-    }
-
-    set scale(v: Vector2) { this.getVariable(UNIFORM_SCALE).set(v); }
-    set position(v: Vector2) { this.getVariable(UNIFORM_OFFSET).set(v); }
 
     set colour(v: Vec4) { this.getVariable(Text.UNIFORM_COLOUR).set(v); }
 
