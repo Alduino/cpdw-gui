@@ -27,17 +27,18 @@ export class Shader {
         return result.join("\n");
     }
 
-    public readonly source: string;
+    private readonly src: string;
+
     public readonly variables: Variable<any>[];
 
     constructor(builder: ShaderBuilder, ctx: WebGLRenderingContext, programName: string, variableCache: VariableCache) {
         builder.build(ctx, programName, variableCache);
-        this.source = builder.getResult();
+        this.src = builder.getResult();
         this.variables = builder.variables;
     }
 
-    log() {
-        console.log(Shader.format(this.source));
+    get source() {
+        return Shader.format(this.src);
     }
 }
 

@@ -20,7 +20,7 @@ export default class Program {
         if (!this.ctx.getShaderParameter(shader, this.ctx.COMPILE_STATUS)) {
             const log = this.ctx.getShaderInfoLog(shader);
             this.ctx.deleteShader(shader);
-            shaderSource.log();
+            console.log(shaderSource.source);
             throw new Error("Could not compile above shader: " + log);
         }
 
