@@ -4,12 +4,12 @@ import {uVec4} from "../variables/uniform/Vec4UniformVariable";
 import {Transformable, TransformMixin, transformShader} from "../util/transform";
 import {tex2d} from "../variables/texture/ImageTexture2dVariable";
 import Vector2 from "@equinor/videx-vector2";
-import {MeshType} from "../MeshBuilder";
 import {Vec4} from "../util/Vec4";
 import fontImage from "./fonts/EkMukta-Regular.b64";
 import fontInfoFile from "./fonts/EkMukta-Regular.json";
 import Font from "./fonts/font";
 import UvIndexedMeshBuilder from "../meshBuilders/UvIndexedMeshBuilder";
+import {DrawType, GLContext} from "../../graphics";
 
 const fontInfo = fontInfoFile as Font;
 
@@ -118,7 +118,7 @@ export default class Text extends DrawerBase implements Transformable {
         });
 
         return {
-            type: MeshType.triangles,
+            type: DrawType.triangles,
             vertices: sourceMeshes.map(mesh => mesh.vertices).flat(),
             indices: sourceMeshes.map(mesh => mesh.indices).flat()
         };
@@ -126,9 +126,9 @@ export default class Text extends DrawerBase implements Transformable {
 
     public readonly transform: TransformMixin;
 
-    constructor(ctx: WebGLRenderingContext) {
-        super(ctx, Text.meshBuilder);
-        this.init(Text.vertexShader, Text.fragmentShader);
+    constructor(ctx: GLContext) {
+        super(Text.meshBuilder);
+        this.init(ctx, Text.vertexShader, Text.fragmentShader);
 
         this.transform = new TransformMixin(this);
 

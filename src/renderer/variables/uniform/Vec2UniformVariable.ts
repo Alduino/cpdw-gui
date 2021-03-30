@@ -1,8 +1,9 @@
 import UniformVariable from "./UniformVariable";
 import Vector2 from "@equinor/videx-vector2";
 import Variable, {Precision, VariableCreator} from "../../Variable";
+import {GLProgram, GLUniforms, UniformType} from "../../../graphics";
 
-export default class Vec2UniformVariable extends UniformVariable<Vector2> {
+export default class Vec2UniformVariable extends UniformVariable<Vector2, GLUniforms.f2> {
     protected getPrecisionKeyword(): Precision {
         return this.precision;
     }
@@ -11,12 +12,12 @@ export default class Vec2UniformVariable extends UniformVariable<Vector2> {
         return "vec2";
     }
 
-    constructor(ctx: WebGLRenderingContext, name: string, private precision?: Precision) {
-        super(ctx, name);
+    constructor(program: GLProgram, name: string, location: number, private precision?: Precision) {
+        super(program, name, location, UniformType.f2);
     }
 
-    setValue(value: Vector2, location: WebGLUniformLocation): void {
-        this.ctx.uniform2f(location, value.x, value.y);
+    set(value: Vector2): void {
+        this.uniform.set(value.x, value.y);
     }
 }
 
@@ -25,8 +26,8 @@ class UVec2Creator extends VariableCreator<Vector2> {
         super(name);
     }
 
-    protected createVariable(ctx: WebGLRenderingContext): Variable<Vector2> {
-        return new Vec2UniformVariable(ctx, this.name, this.precision);
+    protected createVariable(program: GLProgram, location: number): Variable<Vector2> {
+        return new Vec2UniformVariable(program, this.name, location, this.precision);
     }
 }
 

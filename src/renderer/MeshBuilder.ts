@@ -1,10 +1,5 @@
 import DrawerBase from "./DrawerBase";
-
-export enum MeshType {
-    triangles,
-    triangleFan,
-    triangleStrip
-}
+import {DrawType} from "../graphics";
 
 type KeysOfType<TSource, TType> = {
     [key in keyof TSource]: TSource[key] extends TType ? key : never;
@@ -31,7 +26,7 @@ export default interface MeshBuilder<T extends DrawerBase> {
     /**
      * The triangle mode of the mesh. Can be set at any time
      */
-    triMode: MeshType;
+    triMode: DrawType;
 
     /**
      * Re-calculate the mesh, and fill out attributeValues

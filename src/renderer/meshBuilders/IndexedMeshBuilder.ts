@@ -1,11 +1,12 @@
 import Vector2 from "@equinor/videx-vector2";
-import MeshBuilder, {MeshType} from "../MeshBuilder";
+import MeshBuilder from "../MeshBuilder";
 import DrawerBase from "../DrawerBase";
 import {aVec2b} from "../variables/attribute/Vec2BufferAttributeVariable";
+import {DrawType} from "../../graphics";
 
 export interface IndexedMesh {
     // defaults to the previous value, or triangles
-    type?: MeshType;
+    type?: DrawType;
 
     // list of all the vertices
     vertices: Vector2[];
@@ -18,7 +19,7 @@ export default class IndexedMeshBuilder<T extends DrawerBase> implements MeshBui
     static readonly ATTR_COORD = aVec2b("meshCoord", {});
 
     vertexCount: number;
-    triMode: MeshType = MeshType.triangles;
+    triMode: DrawType = DrawType.triangles;
 
     constructor(private generate: (param: T) => IndexedMesh) {}
 

@@ -1,80 +1,52 @@
 import Variable from "../Variable";
-import Bindable, {bindableSymbol} from "./Bindable";
+import {GLBuffer, GLProgram} from "../../graphics";
+import {BufferUsage} from "../../graphics/webgl/WebGLBuffer";
+import {BufferElementType, BufferType} from "../../graphics/interfaces/Buffer";
 
 export interface BufferValue<T> {
     values: T[];
     indices: number[];
 }
 
-export default abstract class BufferVariable<T> extends Variable<BufferValue<T>> implements Bindable {
+export default abstract class BufferVariable<T> extends Variable<BufferValue<T>> {
     private static packIndices(indices: number[]) {
         return new Uint16Array(indices);
     }
 
-    private valueBuffer: WebGLBuffer;
-    private indexBuffer: WebGLBuffer;
+    private readonly valueBuffer: GLBuffer;
+    private readonly indexBuffer: GLBuffer;
 
     // Packs the source value into a buffer
     protected abstract pack(value: T[]): BufferSource;
 
-    // Set up the buffer. Note: the buffers have already been bound
-    protected abstract setUpPtr(location: number, buffer: WebGLBuffer): void;
+    protected constructor(
+        program: GLProgram,
+        name: string,
+        location: number,
+        elemType: BufferElementType
+    ) {
+        super(program, name, location);
 
-    private init() {
-        const location = this.getLocation();
-        if (location === null || location === -1) return;
-
-        this.valueBuffer = this.ctx.createBuffer();
-        this.indexBuffer = this.ctx.createBuffer();
-
-        this.ctx.getExtension("GMAN_debug_helper")?.tagObject(this.valueBuffer, this.getAccessor() + ":value");
-        this.ctx.getExtension("GMAN_debug_helper")?.tagObject(this.indexBuffer, this.getAccessor() + ":index");
-
-        // call bind to set up
-        this.bind();
-        this.unbind();
+        this.valueBuffer = program.createBuffer(BufferType.vertexData, elemType);
+        this.indexBuffer = program.createBuffer(BufferType.vertexDataIndices, BufferElementType._);
     }
 
-    protected constructor(
-        ctx: WebGLRenderingContext,
-        name: string,
-        private readonly usage?: GLenum
-    ) {
-        super(ctx, name);
-        if (typeof this.usage === "undefined") this.usage = this.ctx.STATIC_DRAW;
+    protected getValueBuffer() {
+        return this.valueBuffer;
+    }
 
-        this.onProgramSet.push(() => this.init());
-        this[bindableSymbol] = true;
+    protected getIndexBuffer() {
+        return this.indexBuffer;
     }
 
     set(value: BufferValue<T>) {
-        console.log("set", this.getAccessor());
         const packedValues = this.pack(value.values);
         const packedIndices = BufferVariable.packIndices(value.indices);
 
         // the attribute doesn't exist, and doesn't get into init
         if (!this.valueBuffer || !this.indexBuffer) return;
 
-        this.bind();
-
-        this.ctx.bufferData(this.ctx.ARRAY_BUFFER, packedValues, this.usage);
-        this.ctx.bufferData(this.ctx.ELEMENT_ARRAY_BUFFER, packedIndices, this.usage);
-
-        this.unbind();
+        this.valueBuffer.write(packedValues);
+        this.indexBuffer.write(packedIndices);
     }
-
-    bind() {
-        this.ctx.bindBuffer(this.ctx.ARRAY_BUFFER, this.valueBuffer);
-        this.ctx.bindBuffer(this.ctx.ELEMENT_ARRAY_BUFFER, this.indexBuffer);
-
-        // and bind the vertex attrib array
-        this.setUpPtr(this.getLocation(), this.valueBuffer);
-    }
-
-    unbind() {
-        this.ctx.bindBuffer(this.ctx.ELEMENT_ARRAY_BUFFER, null);
-        this.ctx.bindBuffer(this.ctx.ARRAY_BUFFER, null);
-    }
-
-    [bindableSymbol]: true;
 }

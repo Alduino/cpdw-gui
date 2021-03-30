@@ -1,14 +1,15 @@
 import Vector2 from "@equinor/videx-vector2";
-import MeshBuilder, {MeshType} from "../MeshBuilder";
+import MeshBuilder from "../MeshBuilder";
 import DrawerBase from "../DrawerBase";
 import {aVec2b} from "../variables/attribute/Vec2BufferAttributeVariable";
+import {DrawType} from "../../graphics";
 
 // [pos, uv]
 export type Vertex = [Vector2, Vector2];
 
 export interface UvIndexedMesh {
     // defaults to the previous value, or triangles
-    type?: MeshType;
+    type?: DrawType;
 
     // list of all the vertices
     vertices: Vertex[];
@@ -22,7 +23,7 @@ export default class UvIndexedMeshBuilder<T extends DrawerBase> implements MeshB
     static readonly ATTR_UV = aVec2b("meshUv", {});
 
     vertexCount: number;
-    triMode: MeshType = MeshType.triangles;
+    triMode: DrawType = DrawType.triangles;
 
     constructor(private generate: (param: T) => UvIndexedMesh) {}
 

@@ -1,25 +1,17 @@
 import BufferAttributeVariable from "./BufferAttributeVariable";
 import Variable, {Precision, VariableCreator} from "../../Variable";
-import KeysOfType from "../../../utils/KeysOfType";
 import {BufferValue} from "../BufferVariable";
 import {Vec4} from "../../util/Vec4";
+import {BufferElementType, GLProgram} from "../../../graphics";
 
 export default class Vec4BufferAttributeVariable extends BufferAttributeVariable<Vec4> {
     constructor(
-        ctx: WebGLRenderingContext,
+        program: GLProgram,
         name: string,
-        usage?: GLenum,
+        location: number,
         private precision?: Precision
     ) {
-        super(ctx, name, usage);
-    }
-
-    protected getSize(): number {
-        return 4;
-    }
-
-    protected getType(): GLenum {
-        return this.ctx.FLOAT;
+        super(program, name, location, BufferElementType.f4);
     }
 
     protected pack(value: Vec4[]): BufferSource {
@@ -36,7 +28,6 @@ export default class Vec4BufferAttributeVariable extends BufferAttributeVariable
 }
 
 interface Vec4Opts {
-    usage?: KeysOfType<WebGLRenderingContext, GLenum>;
     precision?: Precision;
 }
 
@@ -45,8 +36,8 @@ class AVec4BCreator extends VariableCreator<BufferValue<Vec4>> {
         super(name);
     }
 
-    protected createVariable(ctx: WebGLRenderingContext): Variable<BufferValue<Vec4>> {
-        return new Vec4BufferAttributeVariable(ctx, this.name, ctx[this.opts.usage], this.opts.precision);
+    protected createVariable(program: GLProgram, location: number): Variable<BufferValue<Vec4>> {
+        return new Vec4BufferAttributeVariable(program, this.name, location, this.opts.precision);
     }
 }
 

@@ -1,25 +1,17 @@
 import Vector2 from "@equinor/videx-vector2";
 import BufferAttributeVariable from "./BufferAttributeVariable";
 import Variable, {Precision, VariableCreator} from "../../Variable";
-import KeysOfType from "../../../utils/KeysOfType";
 import {BufferValue} from "../BufferVariable";
+import {BufferElementType, GLProgram} from "../../../graphics";
 
 export default class Vec2BufferAttributeVariable extends BufferAttributeVariable<Vector2> {
     constructor(
-        ctx: WebGLRenderingContext,
+        program: GLProgram,
         name: string,
-        usage?: GLenum,
+        location: number,
         private precision?: Precision
     ) {
-        super(ctx, name, usage);
-    }
-
-    protected getSize(): number {
-        return 2;
-    }
-
-    protected getType(): GLenum {
-        return this.ctx.FLOAT;
+        super(program, name, location, BufferElementType.f2);
     }
 
     protected pack(value: Vector2[]): BufferSource {
@@ -36,7 +28,6 @@ export default class Vec2BufferAttributeVariable extends BufferAttributeVariable
 }
 
 interface Vec2Opts {
-    usage?: KeysOfType<WebGLRenderingContext, GLenum>;
     precision?: Precision;
 }
 
@@ -45,8 +36,8 @@ class AVec2BCreator extends VariableCreator<BufferValue<Vector2>> {
         super(name);
     }
 
-    protected createVariable(ctx: WebGLRenderingContext): Variable<BufferValue<Vector2>> {
-        return new Vec2BufferAttributeVariable(ctx, this.name, ctx[this.opts.usage], this.opts.precision);
+    protected createVariable(program: GLProgram, location: number): Variable<BufferValue<Vector2>> {
+        return new Vec2BufferAttributeVariable(program, this.name, location, this.opts.precision);
     }
 }
 

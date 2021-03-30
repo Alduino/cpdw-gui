@@ -1,8 +1,9 @@
 import UniformVariable from "./UniformVariable";
 import Variable, {Precision, VariableCreator} from "../../Variable";
 import {Vec4} from "../../util/Vec4";
+import {GLProgram, GLUniforms, UniformType} from "../../../graphics";
 
-export default class Vec4UniformVariable extends UniformVariable<Vec4> {
+export default class Vec4UniformVariable extends UniformVariable<Vec4, GLUniforms.f4> {
     protected getPrecisionKeyword(): Precision {
         return this.precision;
     }
@@ -11,12 +12,12 @@ export default class Vec4UniformVariable extends UniformVariable<Vec4> {
         return "vec4";
     }
 
-    constructor(ctx: WebGLRenderingContext, name: string, private precision?: Precision) {
-        super(ctx, name);
+    constructor(program: GLProgram, name: string, location: number, private precision?: Precision) {
+        super(program, name, location, UniformType.f4);
     }
 
-    setValue(value: Vec4, location: WebGLUniformLocation): void {
-        this.ctx.uniform4f(location, ...value);
+    set(value: Vec4): void {
+        this.uniform.set(...value);
     }
 }
 
@@ -25,8 +26,8 @@ class UVec4Creator extends VariableCreator<Vec4> {
         super(name);
     }
 
-    protected createVariable(ctx: WebGLRenderingContext): Variable<Vec4> {
-        return new Vec4UniformVariable(ctx, this.name, this.precision);
+    protected createVariable(program: GLProgram, location: number): Variable<Vec4> {
+        return new Vec4UniformVariable(program, this.name, location, this.precision);
     }
 }
 
