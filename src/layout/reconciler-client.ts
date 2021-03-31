@@ -211,6 +211,11 @@ export interface RenderOptions {
 }
 
 const roots = new Map<GLContext, {container: any, node: RootNode}>();
+
+/**
+ * Renders a React node with the specified options
+ * @returns Call this function every frame, it does the actual page rendering.
+ */
 export function render(element: ReactNode, opts: RenderOptions, callback: () => void) {
     CpdwRenderer.injectIntoDevTools({
         bundleType: process.env.NODE_ENV === "production" ? 0 : 1,
