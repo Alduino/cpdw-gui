@@ -20,7 +20,7 @@ export const Text: FC<TextProps> = props => {
             fill={glColour(props.fill)}
             value={props.children}
 
-            scale={(glVec2(props.scale) || Vector2.one).scale(props.fontSize)}
+            scale={(glVec2(props.scale) || Vector2.one).scale(props.fontSize || 16)}
             position={glVec2(props.position) || Vector2.zero}
         />
     );
