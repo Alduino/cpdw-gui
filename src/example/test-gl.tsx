@@ -6,8 +6,8 @@ import Color from "color";
 import {perFrame} from "../WindowUtils";
 
 const App: FC = () => (
-    <Rectangle size={[282, 73]} fill={Color("midnightblue")}>
-        <Text fill={Color("orange")} fontSize={60}>Much beautiful</Text>
+    <Rectangle position={[100, 100]} scale={[5, 5]} size={[282, 73]} fill={Color("midnightblue")}>
+        <Text fill={Color("orange")} fontSize={60} position={[-100, 0]}>Much beautiful</Text>
     </Rectangle>
 );
 
