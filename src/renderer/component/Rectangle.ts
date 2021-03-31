@@ -1,7 +1,7 @@
 import Vector2 from "@equinor/videx-vector2";
 import DrawerBase from "../DrawerBase";
 import createShader from "../Shader";
-import ColouredIndexedMeshBuilder, {Colour} from "../meshBuilders/ColouredIndexedMeshBuilder";
+import ColouredIndexedMeshBuilder, {Colour, ColouredIndexedMesh} from "../meshBuilders/ColouredIndexedMeshBuilder";
 import {Transformable, TransformMixin, transformShader} from "../util/transform";
 import {GLContext} from "../../graphics";
 
@@ -37,9 +37,32 @@ export default class Rectangle extends DrawerBase implements Transformable {
         }
     `;
 
+    private static rectOnlyMesh(p: Rectangle, fill: Colour): ColouredIndexedMesh {
+        const left = 0;
+        const right = p.size.x;
+        const top = 0;
+        const bottom = p.size.y;
+
+        return {
+            vertices: [
+                [new Vector2(left, top), fill],
+                [new Vector2(right, top), fill],
+                [new Vector2(left, bottom), fill],
+                [new Vector2(right, bottom), fill]
+            ],
+            indices: [
+                0, 1, 3,
+                0, 2, 3
+            ]
+        };
+    }
+
     private static meshBuilder = new ColouredIndexedMeshBuilder<Rectangle>(p => {
-        const borderColour: Colour = [...p.borderColour, 1];
-        const innerColour: Colour = [...p.fill, 1];
+        if (p.borderSize.equals(Vector2.zero)) return Rectangle.rectOnlyMesh(p, p.fill);
+        if (p.size.x < p.borderSize.x * 2 || p.size.y < p.borderSize.y * 2) return Rectangle.rectOnlyMesh(p, p.borderColour);
+
+        const borderColour = p.borderColour;
+        const innerColour = p.fill;
 
         const left = 0;
         const right = p.size.x;
@@ -90,8 +113,8 @@ export default class Rectangle extends DrawerBase implements Transformable {
         });
     });
 
-    private _fill: [number, number, number] = [255, 255, 255];
-    private _borderColour: [number, number, number] = [0, 0, 0];
+    private _fill: Colour = [1, 1, 1, 1];
+    private _borderColour: Colour = [0, 0, 0, 1];
     private _borderSize = new Vector2(1);
     private _size = new Vector2(50, 50);
 
@@ -130,6 +153,7 @@ export default class Rectangle extends DrawerBase implements Transformable {
 
     // @mesh-update
     set borderSize(v) {
+        if (this._borderSize.equals(v)) return;
         this._borderSize = v;
         this.updateMesh();
     }
@@ -140,6 +164,7 @@ export default class Rectangle extends DrawerBase implements Transformable {
 
     // @mesh-update
     set size(v) {
+        if (this._size.equals(v)) return;
         this._size = v;
         this.updateMesh();
     }

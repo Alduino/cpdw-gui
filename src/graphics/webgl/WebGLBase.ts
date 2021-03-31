@@ -46,7 +46,7 @@ export default abstract class WebGLBase {
      * (i.e. only need to call if instance does not have a static lifetime)
      * @protected
      */
-    protected cleanup() {
+    cleanup() {
         this.checkCleaned();
 
         // cleanup modifies the ownedChildren set so we need to clone it first

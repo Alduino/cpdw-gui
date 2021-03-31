@@ -2,6 +2,7 @@ import createShader from "../Shader";
 import {uVec2} from "../variables/uniform/Vec2UniformVariable";
 import Vector2 from "@equinor/videx-vector2";
 import DrawerBase from "../DrawerBase";
+import Drawer from "../Drawer";
 
 export const UNIFORM_VIEWPORT_SIZE = uVec2("transformViewportSize");
 
@@ -25,11 +26,17 @@ export const transformShader = createShader`
     }
 `;
 
-export interface Transformable {
-    readonly transform: TransformMixin;
+export interface Transform {
+    offset: Vector2;
+    scale: Vector2;
+    viewportSize: Vector2;
 }
 
-export class TransformMixin {
+export interface Transformable {
+    readonly transform: Transform;
+}
+
+export class TransformMixin implements Transform {
     private _offset: Vector2;
     private _scale: Vector2;
     private _viewportSize: Vector2;
@@ -42,6 +49,12 @@ export class TransformMixin {
         this.offset = Vector2.zero;
         this.scale = Vector2.one;
         this.viewportSize = Vector2.one;
+    }
+
+    assign(val: Partial<Transform>) {
+        if (val.offset != null && !this.offset.equals(val.offset)) this.offset = val.offset;
+        if (val.scale != null && !this.scale.equals(val.scale)) this.scale = val.scale;
+        if (val.viewportSize != null && !this.viewportSize.equals(val.viewportSize)) this.viewportSize = val.viewportSize;
     }
 
     get offset() { return this._offset; }

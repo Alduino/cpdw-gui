@@ -6,7 +6,8 @@
     "noImplicitAny": true,
     "esModuleInterop": true,
     "resolveJsonModule": true,
-    "outDir": "out"
+    "outDir": "out",
+    "jsx": "react"
   },
   "include": [
     "src"

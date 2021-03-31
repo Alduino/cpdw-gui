@@ -5,7 +5,7 @@ import {aVec2b} from "../variables/attribute/Vec2BufferAttributeVariable";
 import {aVec4b} from "../variables/attribute/Vec4BufferAttributeVariable";
 import {DrawType} from "../../graphics";
 
-export type Colour = [number, number, number, number];
+export type Colour = readonly [number, number, number, number];
 export type Vertex = [Vector2, Colour];
 
 export interface ColouredIndexedMesh {

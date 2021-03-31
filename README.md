@@ -7,7 +7,7 @@ In the future, this is planned to be a GUI library to make Windows-style GUIs, b
 and natively, without Electron.
 
 Currently, it is in very early stages, and I'm still experimenting with how it is going to be set out.
-The example in `src/example/test-gl.ts` is a good indication of what works, as I'm using it as testing
+The example in `src/example/test-gl.tsx` is a good indication of what works, as I'm using it as testing
 grounds.
 
 ## Example
@@ -34,5 +34,7 @@ it looks cool and I went a bit overboard).
     can handle.
 - `DrawerBase`: Handles most of the WebGL setup. An abstract class for anything that uses WebGL rendering to
     implement.
-  
+
+**React Components**: React-based layer on top of the flat renderer
+
 You can see an example of a `Drawer` in the example script. It currently renders an n-sided polygon.

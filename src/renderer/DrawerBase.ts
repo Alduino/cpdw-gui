@@ -35,6 +35,10 @@ export default abstract class DrawerBase implements Drawer {
         this.program.draw(this.meshBuilder.vertexCount, this.meshBuilder.triMode);
     }
 
+    unmount() {
+        this.program.cleanup();
+    }
+
     /**
      * Must be the last thing to run in the constructor
      * @protected

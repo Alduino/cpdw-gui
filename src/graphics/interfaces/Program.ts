@@ -28,4 +28,6 @@ export default interface Program {
     createUniform(type: UniformType.f3, name: string, location: number): Uniforms.f3;
     createUniform(type: UniformType.f4, name: string, location: number): Uniforms.f4;
     createUniform(type: UniformType, name: string, location: number): Uniform<any>;
+
+    cleanup(): void;
 }
