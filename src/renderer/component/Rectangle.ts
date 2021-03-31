@@ -3,7 +3,7 @@ import DrawerBase from "../DrawerBase";
 import createShader from "../Shader";
 import ColouredIndexedMeshBuilder, {Colour} from "../meshBuilders/ColouredIndexedMeshBuilder";
 import {Transformable, TransformMixin, transformShader} from "../util/transform";
-import GraphicsContext from "../../graphics/interfaces/GraphicsContext";
+import {GLContext} from "../../graphics";
 
 export default class Rectangle extends DrawerBase implements Transformable {
     // language=GLSL
@@ -97,7 +97,7 @@ export default class Rectangle extends DrawerBase implements Transformable {
 
     public readonly transform: TransformMixin;
 
-    constructor(ctx: GraphicsContext) {
+    constructor(ctx: GLContext) {
         super(Rectangle.meshBuilder);
         this.init(ctx, Rectangle.vertexShader, Rectangle.fragmentShader);
 
