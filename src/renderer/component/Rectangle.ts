@@ -2,10 +2,10 @@ import Vector2 from "@equinor/videx-vector2";
 import DrawerBase from "../DrawerBase";
 import createShader from "../Shader";
 import ColouredIndexedMeshBuilder, {Colour, ColouredIndexedMesh} from "../meshBuilders/ColouredIndexedMeshBuilder";
-import {Transformable, TransformMixin, transformShader} from "../util/transform";
 import {GLContext} from "../../graphics";
+import {transformShader} from "../util/transform";
 
-export default class Rectangle extends DrawerBase implements Transformable {
+export default class Rectangle extends DrawerBase {
     // language=GLSL
     private static vertexShader = createShader`
         precision mediump float;
@@ -116,15 +116,14 @@ export default class Rectangle extends DrawerBase implements Transformable {
     private _fill: Colour = [1, 1, 1, 1];
     private _borderColour: Colour = [0, 0, 0, 1];
     private _borderSize = new Vector2(1);
-    private _size = new Vector2(50, 50);
-
-    public readonly transform: TransformMixin;
 
     constructor(ctx: GLContext) {
         super(Rectangle.meshBuilder);
         this.init(ctx, Rectangle.vertexShader, Rectangle.fragmentShader);
+    }
 
-        this.transform = new TransformMixin(this);
+    protected handleSizeChanged() {
+        this.updateMesh();
     }
 
     get fill() {
@@ -155,17 +154,6 @@ export default class Rectangle extends DrawerBase implements Transformable {
     set borderSize(v) {
         if (this._borderSize.equals(v)) return;
         this._borderSize = v;
-        this.updateMesh();
-    }
-
-    get size() {
-        return this._size;
-    }
-
-    // @mesh-update
-    set size(v) {
-        if (this._size.equals(v)) return;
-        this._size = v;
         this.updateMesh();
     }
 }

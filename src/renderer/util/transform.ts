@@ -2,7 +2,6 @@ import createShader from "../Shader";
 import {uVec2} from "../variables/uniform/Vec2UniformVariable";
 import Vector2 from "@equinor/videx-vector2";
 import DrawerBase from "../DrawerBase";
-import Drawer from "../Drawer";
 
 export const UNIFORM_VIEWPORT_SIZE = uVec2("transformViewportSize");
 
@@ -36,6 +35,12 @@ export interface Transformable {
     readonly transform: Transform;
 }
 
+export function isTransformable(obj: any): obj is Transformable {
+    if (obj == null) return false;
+    if (typeof obj !== "object") return false;
+    return typeof obj.transform === "object";
+}
+
 export class TransformMixin implements Transform {
     private _offset: Vector2;
     private _scale: Vector2;
@@ -46,6 +51,9 @@ export class TransformMixin implements Transform {
      * Drawer should include `transformShader` for this to have any effect.
      */
     constructor(private drawer: DrawerBase) {
+    }
+
+    init() {
         this.offset = Vector2.zero;
         this.scale = Vector2.one;
         this.viewportSize = Vector2.one;

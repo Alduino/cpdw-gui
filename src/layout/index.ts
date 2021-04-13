@@ -1,3 +1,4 @@
 export {render} from "./reconciler-client";
-export {Rectangle} from "./wrapper/Rectangle";
-export {Text} from "./wrapper/Text";
+export * from "./components/layout/AbsoluteLayout";
+export * from "./components/layout/FlexLayout";
+export * from "./components/Rectangle";

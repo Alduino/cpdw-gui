@@ -1,15 +1,19 @@
 import {WindowWrapper} from "../WindowWrapper";
-import {Rectangle, render, Text} from "../layout";
+import {FlexLayout, Rectangle, render} from "../layout";
 import React, {FC} from "react";
 import {WebGLImpl} from "../graphics";
-import Color from "color";
 import {perFrame} from "../WindowUtils";
 
-const App: FC = () => (
-    <Rectangle position={[100, 100]} scale={[5, 5]} size={[282, 73]} fill={Color("midnightblue")}>
-        <Text fill={Color("orange")} fontSize={60} position={[-100, 0]}>Much beautiful</Text>
-    </Rectangle>
-);
+const App: FC = () => {
+    return (
+        <FlexLayout direction="horiz">
+            <Rectangle />
+            <Rectangle />
+            <Rectangle flexFr={2} />
+            <Rectangle flexFr={1} />
+        </FlexLayout>
+    );
+};
 
 export function testFn(win: WindowWrapper) {
     const draw = render(<App />, {

@@ -1,7 +1,7 @@
 import DrawerBase from "../DrawerBase";
 import createShader from "../Shader";
 import {uVec4} from "../variables/uniform/Vec4UniformVariable";
-import {Transformable, TransformMixin, transformShader} from "../util/transform";
+import {transformShader} from "../util/transform";
 import {tex2d} from "../variables/texture/ImageTexture2dVariable";
 import Vector2 from "@equinor/videx-vector2";
 import {Vec4} from "../util/Vec4";
@@ -13,7 +13,7 @@ import {DrawType, GLContext} from "../../graphics";
 
 const fontInfo = fontInfoFile as Font;
 
-export default class Text extends DrawerBase implements Transformable {
+export default class Text extends DrawerBase {
     private static UNIFORM_COLOUR = uVec4("colour");
     private static TEX2D_MAP = tex2d("map");
 
@@ -63,7 +63,7 @@ export default class Text extends DrawerBase implements Transformable {
         }
     `;
 
-    private static buildCharacterMesh(character: string, posOffset: Vector2, indexOffset: number) {
+    private static buildCharacterMesh(character: string, posOffset: Vector2, fontSize: number, indexOffset: number) {
         if (!fontInfo.info.charset.includes(character)) throw new Error(`Invalid character \`${character}\``);
 
         const charInfo = fontInfo.chars.find(el => el.id === character.charCodeAt(0));
@@ -79,7 +79,7 @@ export default class Text extends DrawerBase implements Transformable {
         const bl = new Vector2(posOffset.add(new Vector2(charInfo.xoffset, charInfo.yoffset)));
 
         // quad size
-        const qs = new Vector2(charInfo.width, charInfo.height);
+        const qs = new Vector2(charInfo.width * fontSize, charInfo.height * fontSize);
 
         return {
             vertices: [
@@ -104,7 +104,7 @@ export default class Text extends DrawerBase implements Transformable {
         const sourceMeshes = sourceChars.map((char, i) => {
             const posOffset = new Vector2(nextX, 0);
             const indexOffset = i * 4;
-            const mesh = Text.buildCharacterMesh(char, posOffset, indexOffset);
+            const mesh = Text.buildCharacterMesh(char, posOffset, obj.size.y, indexOffset);
             nextX = mesh.extent.x;
             maxHeight = Math.max(maxHeight, mesh.extent.y);
             return mesh;
@@ -124,14 +124,9 @@ export default class Text extends DrawerBase implements Transformable {
         };
     });
 
-    public readonly transform: TransformMixin;
-
     constructor(ctx: GLContext) {
         super(Text.meshBuilder);
         this.init(ctx, Text.vertexShader, Text.fragmentShader);
-
-        this.transform = new TransformMixin(this);
-
         this.getVariable(Text.TEX2D_MAP).set(fontImage);
     }
 

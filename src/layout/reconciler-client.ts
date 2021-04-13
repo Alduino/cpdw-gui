@@ -1,14 +1,18 @@
 import Reconciler, {OpaqueHandle} from "react-reconciler";
-import RootNode, {NodeName, NodeProps} from "./dom/RootNode";
-import DrawableNode from "./dom/DrawableNode";
-import {ReactNode, version} from "react";
-import {GLContext} from "../graphics";
+import {FC, ReactNode, version} from "react";
 import Vector2 from "@equinor/videx-vector2";
+import RootNode from "./dom/RootNode";
+import {GLContext} from "../graphics";
+import DrawableNode from "./dom/nodes/DrawableNode";
+import {intrinsic} from "./dom/intrinsic-elements";
 
-type Type = NodeName;
-type Props = NodeProps;
+type PropsOf<T> = T extends FC<infer Props> ? Props : never;
+type IntrinsicElements = typeof intrinsic;
+
+type Type = keyof IntrinsicElements;
+type Props = PropsOf<IntrinsicElements[keyof IntrinsicElements]>;
 type Container = RootNode;
-type Instance = DrawableNode;
+type Instance = DrawableNode<any, any, any>;
 type TextInstance = never;
 type SuspenseInstance = never;
 type HydratableInstance = never;
@@ -166,7 +170,7 @@ const CpdwRenderer = Reconciler<Type,
     preparePortalMount(containerInfo: Container): void {
     },
     prepareUpdate(instance: Instance, type: Type, oldProps: Props, newProps: Props, rootContainer: Container, hostContext: HostContext): UpdatePayload | null {
-        const entries = Object.entries(newProps) as [keyof NodeProps, NodeProps[keyof NodeProps]][];
+        const entries = Object.entries(newProps) as [keyof Props, Props[keyof Props]][];
         const resultEntries = entries.filter(([key, value]) => oldProps[key] !== value);
 
         return Object.fromEntries(resultEntries);
@@ -236,7 +240,7 @@ export function render(element: ReactNode, opts: RenderOptions, callback: () => 
     CpdwRenderer.updateContainer(element, container, null, callback);
 
     if (needsInit) {
-        opts.listenForResize(node.onResize.bind(node));
+        opts.listenForResize(node.setViewportSize.bind(node));
     }
 
     return () => node.draw();
