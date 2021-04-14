@@ -41,9 +41,9 @@ export class FlexLayoutNode extends DrawableNode<Props, SubProps, "flex"> {
 
         const maxPossibleSize = this.getParent()?.getMaximumPossibleSize() || new Vector2(Infinity);
 
-        const maxSizeDimen = this.direction === "horiz" ? maxPossibleSize.x : maxPossibleSize.y;
+        const maxSizeDimen = this.direction === "horiz" ? (maxPossibleSize.x - this.padding.left - this.padding.right) : (maxPossibleSize.y - this.padding.top - this.padding.bottom);
         const totalFr = infos.reduce((prev, curr) => prev + (curr.subProps?.fr || 0), 0);
-        const totalNonFr = infos.reduce((prev, curr) => prev + (curr.subProps.fr ? 0 : this.direction === "horiz" ? curr.requestedTransform.size.x : curr.requestedTransform.size.y), 0);
+        const totalNonFr = infos.reduce((prev, curr) => prev + this.gap + (curr.subProps.fr ? 0 : this.direction === "horiz" ? curr.requestedTransform.size.x : curr.requestedTransform.size.y), -this.gap);
         const frSpace = maxSizeDimen - totalNonFr;
         const oneFr = frSpace / totalFr;
 
@@ -63,7 +63,7 @@ export class FlexLayoutNode extends DrawableNode<Props, SubProps, "flex"> {
             } else {
                 transform = {
                     size: subProps.fr ? new Vector2(requestedTransform.size.x, oneFr * subProps.fr) : requestedTransform.size,
-                    position: new Vector2(this.padding.left, totalSize.y)
+                    position: new Vector2(this.padding.left, totalSize.y + this.gap)
                 };
 
                 totalSize = new Vector2(

@@ -6,7 +6,7 @@ import {perFrame} from "../WindowUtils";
 
 const App: FC = () => {
     return (
-        <FlexLayout direction="horiz">
+        <FlexLayout direction="horiz" padding={5} gap={5}>
             <Rectangle />
             <Rectangle />
             <Rectangle flexFr={2} />
