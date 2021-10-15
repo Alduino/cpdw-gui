@@ -7,6 +7,7 @@ import {intrinsic} from "./intrinsic-elements";
 import {AbsoluteLayoutNode} from "./nodes/layout/AbsoluteLayoutNode";
 import {RectangleNode} from "./nodes/shapes/RectangleNode";
 import {FlexLayoutNode} from "./nodes/layout/FlexLayoutNode";
+import {TextNode} from "./nodes/TextNode";
 
 type PropsOf<T> = T extends FC<infer Props> ? Props : never;
 type IntrinsicElements = typeof intrinsic;
@@ -20,7 +21,7 @@ export default class RootNode extends Node {
     }
 
     getMaximumPossibleSize(): Vector2 {
-        return this.viewportSize;
+        return this.viewportSize || Vector2.positiveInfinity;
     }
 
     setViewportSize(size: Vector2) {
@@ -34,11 +35,13 @@ export default class RootNode extends Node {
     createNode<Name extends keyof IntrinsicElements>(name: Name, props: IT<Name>) {
         switch (name) {
             case "layoutAbsolute":
-                return new AbsoluteLayoutNode();
+                return new AbsoluteLayoutNode(props as IT<"layoutAbsolute">);
             case "layoutFlex":
                 return new FlexLayoutNode(this.ctx, props as IT<"layoutFlex">);
             case "rectangle":
                 return new RectangleNode(this.ctx, props as IT<"rectangle">);
+            case "text":
+                return new TextNode(this.ctx, props as IT<"text">);
             default:
                 throw new Error(`${name} is not an intrinsic element`);
         }

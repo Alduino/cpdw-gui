@@ -1,4 +1,7 @@
-import DrawableNode, {CalculatedTransform, Transform, TransformCalculationInfo} from "../DrawableNode";
+import DrawableNode, {
+    CalculatedTransform, ChildTransformInfo,
+    RequestTransformsFn
+} from "../DrawableNode";
 import Fragment from "../../../../renderer/component/Fragment";
 import {GLContext} from "../../../../graphics";
 import Vector2 from "@equinor/videx-vector2";
@@ -35,24 +38,39 @@ export class FlexLayoutNode extends DrawableNode<Props, SubProps, "flex"> {
         this.handleTransformChanged();
     }
 
-    protected calculateTransform(infos: TransformCalculationInfo<SubProps>[]): CalculatedTransform {
-        const childTransforms: Transform[] = [];
-        let totalSize = new Vector2(this.padding.left, this.padding.top);
+    getMaximumPossibleSize(): Vector2 {
+        return super.getMaximumPossibleSize().sub(this.padding.left + this.padding.right, this.padding.top + this.padding.bottom);
+    }
 
-        const maxPossibleSize = this.getParent()?.getMaximumPossibleSize() || new Vector2(Infinity);
+    protected calculateTransform(requestTransforms: RequestTransformsFn, childCount: number, subProps: SubProps[], maxPossibleSize: Vector2): CalculatedTransform {
+        const maxPossibleSizePadded = maxPossibleSize.sub(this.padding.left + this.padding.right, this.padding.top + this.padding.bottom);
+        const childTransformRequests = this.requestTransformsDefault(requestTransforms, childCount, maxPossibleSizePadded);
 
-        const maxSizeDimen = this.direction === "horiz" ? (maxPossibleSize.x - this.padding.left - this.padding.right) : (maxPossibleSize.y - this.padding.top - this.padding.bottom);
-        const totalFr = infos.reduce((prev, curr) => prev + (curr.subProps?.fr || 0), 0);
-        const totalNonFr = infos.reduce((prev, curr) => prev + this.gap + (curr.subProps.fr ? 0 : this.direction === "horiz" ? curr.requestedTransform.size.x : curr.requestedTransform.size.y), -this.gap);
+        const infos = subProps.map((subProps, i) => ({subProps, requestedTransform: childTransformRequests[i]}));
+
+        const maxSizeDimen = this.direction === "horiz" ? maxPossibleSizePadded.x : maxPossibleSizePadded.y;
+
+        // total number of fr units
+        const totalFr = subProps.reduce((prev, curr) => prev + (curr?.fr || 0), 0);
+
+        // total width of all non-fr children in px
+        const totalNonFr = infos.reduce((prev, curr) => prev + this.gap + (curr.subProps?.fr ? 0 : this.direction === "horiz" ? curr.requestedTransform.size.x : curr.requestedTransform.size.y), -this.gap);
+
         const frSpace = maxSizeDimen - totalNonFr;
+
+        // the amount of pixels that 1fr is equal to
         const oneFr = frSpace / totalFr;
 
+        const childTransforms: ChildTransformInfo[] = [];
+        let totalSize = new Vector2(this.padding.left, this.padding.top);
+
         for (const {requestedTransform, subProps} of infos) {
-            let transform: Transform;
+            let transform: ChildTransformInfo;
 
             if (this.direction === "horiz") {
                 transform = {
-                    size: subProps.fr ? new Vector2(oneFr * subProps.fr, requestedTransform.size.y) : requestedTransform.size,
+                    size: subProps?.fr ? new Vector2(oneFr * subProps.fr, requestedTransform.size.y) : requestedTransform.size,
+                    maxSize: subProps?.fr ? new Vector2(oneFr * subProps.fr, maxPossibleSizePadded.y) : maxPossibleSizePadded,
                     position: new Vector2(totalSize.x, this.padding.top)
                 };
 
@@ -63,6 +81,7 @@ export class FlexLayoutNode extends DrawableNode<Props, SubProps, "flex"> {
             } else {
                 transform = {
                     size: subProps.fr ? new Vector2(requestedTransform.size.x, oneFr * subProps.fr) : requestedTransform.size,
+                    maxSize: subProps.fr ? new Vector2(maxPossibleSizePadded.x, oneFr * subProps.fr) : maxPossibleSizePadded,
                     position: new Vector2(this.padding.left, totalSize.y + this.gap)
                 };
 

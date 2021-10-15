@@ -57,6 +57,7 @@ export default abstract class WebGLBase {
         this.parent?.ownedChildren.delete(this);
 
         this.doCleanup();
+        this.cleaned = true;
     }
 
     /**
@@ -67,7 +68,7 @@ export default abstract class WebGLBase {
     }
 
     /**
-     * Calls `binder` if the last instance to call `target` was not `instance`
+     * Calls `binder` if the last instance to call with the specified `key` was not `instance`
      * @protected
      */
     protected bind(binder: () => void, key: string = this.constructor.name, instance: WebGLBase = this) {

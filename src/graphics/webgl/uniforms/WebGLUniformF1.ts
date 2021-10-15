@@ -5,7 +5,6 @@ import WebGLUniform from "../WebGLUniform";
 export class WebGLUniformF1 extends WebGLUniform<[number]> implements Uniforms.f1 {
     constructor(program: WebGLProgram, name: string) {
         super(program, name);
-
     }
 
     setValue(...value: [number]): void {

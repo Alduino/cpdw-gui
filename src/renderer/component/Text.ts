@@ -63,7 +63,7 @@ export default class Text extends DrawerBase {
         }
     `;
 
-    private static buildCharacterMesh(character: string, posOffset: Vector2, fontSize: number, indexOffset: number) {
+    private static buildCharacterMesh(character: string, posOffset: Vector2, indexOffset: number) {
         if (!fontInfo.info.charset.includes(character)) throw new Error(`Invalid character \`${character}\``);
 
         const charInfo = fontInfo.chars.find(el => el.id === character.charCodeAt(0));
@@ -76,10 +76,10 @@ export default class Text extends DrawerBase {
         const v0 = (charInfo.y + charInfo.height) / texHeight;
 
         // bottom left
-        const bl = new Vector2(posOffset.add(new Vector2(charInfo.xoffset, charInfo.yoffset)));
+        const bl = posOffset.add(charInfo.xoffset, charInfo.yoffset);
 
         // quad size
-        const qs = new Vector2(charInfo.width * fontSize, charInfo.height * fontSize);
+        const qs = new Vector2(charInfo.width, charInfo.height);
 
         return {
             vertices: [
@@ -104,7 +104,7 @@ export default class Text extends DrawerBase {
         const sourceMeshes = sourceChars.map((char, i) => {
             const posOffset = new Vector2(nextX, 0);
             const indexOffset = i * 4;
-            const mesh = Text.buildCharacterMesh(char, posOffset, obj.size.y, indexOffset);
+            const mesh = Text.buildCharacterMesh(char, posOffset, indexOffset);
             nextX = mesh.extent.x;
             maxHeight = Math.max(maxHeight, mesh.extent.y);
             return mesh;

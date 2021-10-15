@@ -4,8 +4,17 @@ import WebGLProgram from "./WebGLProgram";
 import WebGLBuffer from "./WebGLBuffer";
 
 export default class WebGLVertexAttribArray extends WebGLBase implements VertexAttribArray {
-    constructor(private program: WebGLProgram, private name: string, private valueBuffer: WebGLBuffer, private indexBuffer: WebGLBuffer) {
+    private readonly program: WebGLProgram;
+    private readonly name: string;
+    private readonly valueBuffer: WebGLBuffer;
+    private readonly indexBuffer: WebGLBuffer;
+
+    constructor(program: WebGLProgram, name: string, valueBuffer: WebGLBuffer, indexBuffer: WebGLBuffer) {
         super(program);
+        this.program = program;
+        this.name = name;
+        this.valueBuffer = valueBuffer;
+        this.indexBuffer = indexBuffer;
     }
 
     private locationCache: number;

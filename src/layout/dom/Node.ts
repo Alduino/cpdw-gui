@@ -90,4 +90,8 @@ export default abstract class Node extends EventEmitter {
     }
 
     abstract getMaximumPossibleSize(): Vector2;
+
+    getParentMaximumPossibleSize() {
+        return this.getParent()?.getMaximumPossibleSize() ?? Vector2.zero;
+    }
 }

@@ -6,7 +6,7 @@ import {AbsoluteLayoutNode} from "../dom/nodes/layout/AbsoluteLayoutNode";
 import {FlexLayoutSubProps} from "./layout/FlexLayout";
 import {FlexLayoutNode} from "../dom/nodes/layout/FlexLayoutNode";
 
-type SubPropSourceOfBase<T, Name extends string> = { [Key in `${Name}${Capitalize<keyof T & string>}`]: T[keyof T] };
+type SubPropSourceOfBase<T, Name extends string> = { [Key in keyof T as `${Name}${Capitalize<Key & string>}`]: T[Key] };
 export type SubPropSourceOf<T, Base> = Base extends DrawableNode<any, any, infer Name> ? SubPropSourceOfBase<T, Name> : never;
 
 export type SubPropSource =
@@ -17,6 +17,7 @@ export type SubPropSource =
 export type SubPropMapper = (source: SubPropSource) => SubPropIntrinsic;
 
 const context = createContext<SubPropMapper>(null);
+context.displayName = "SubPropMap";
 
 export const SubPropMapProvider = context.Provider;
 export const useSubPropMap = () => useContext(context) || (() => ({}));

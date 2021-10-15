@@ -3,11 +3,12 @@ import {AbsoluteLayoutNode} from "./nodes/layout/AbsoluteLayoutNode";
 import DrawableNode from "./nodes/DrawableNode";
 import {RectangleNode} from "./nodes/shapes/RectangleNode";
 import {FlexLayoutNode} from "./nodes/layout/FlexLayoutNode";
+import {TextNode} from "./nodes/TextNode";
 
 type Constructor<T> = new (...args: any[]) => T;
 type PropsOf<T> = T extends Constructor<DrawableNode<infer Props, any, any>> ? Props : never;
 
-type NamedSubProps<Prefix extends string, SubProps> = { [Key in `${Prefix}${Capitalize<keyof SubProps & string>}`]: SubProps[keyof SubProps] };
+type NamedSubProps<Prefix extends string, SubProps> = { [Key in keyof SubProps as `${Prefix}${Capitalize<Key & string>}`]: SubProps[Key] };
 
 type DrawableSubPropsOf<T> = T extends Constructor<DrawableNode<any, infer SubProps, any>> ? SubProps : never;
 type SubPropPrefix<T> = T extends Constructor<DrawableNode<any, any, infer Prefix>> ? Prefix : never;
@@ -35,7 +36,8 @@ function generateIntrinsic<T>(arg: T): IntrinsicElements<T> {
 export const intrinsic = generateIntrinsic({
     layoutAbsolute: AbsoluteLayoutNode,
     layoutFlex: FlexLayoutNode,
-    rectangle: RectangleNode
+    rectangle: RectangleNode,
+    text: TextNode
 });
 
 type SubPropIntrinsicBase<T> = T extends IntrinsicElements<infer BaseType> ? {[Key in keyof BaseType]: AllNamedSubProps<BaseType[Key]>}[keyof BaseType] : never;

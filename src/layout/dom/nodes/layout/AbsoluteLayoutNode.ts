@@ -1,5 +1,5 @@
 import Vector2 from "@equinor/videx-vector2";
-import DrawableNode, {CalculatedTransform, TransformCalculationInfo} from "../DrawableNode";
+import DrawableNode, {CalculatedTransform, RequestTransformsFn} from "../DrawableNode";
 import Fragment from "../../../../renderer/component/Fragment";
 
 function vecMax(a: Vector2, b: Vector2) {
@@ -14,37 +14,44 @@ interface Props {
 }
 
 interface SubProps {
-    position: Vector2;
+    position?: Vector2;
 }
 
 export class AbsoluteLayoutNode extends DrawableNode<Props, SubProps, "absolute"> {
     protected readonly subPrefix = "absolute";
 
-    constructor() {
+    constructor(props: Props) {
         super(new Fragment());
-        this.applyProps({});
+        this.applyProps(props);
         this.handleTransformChanged();
     }
 
-    protected calculateTransform(infos: TransformCalculationInfo<SubProps>[]): CalculatedTransform {
-        const maxSize = infos
-            .reduce((prev, curr) => vecMax(prev, curr.requestedTransform.size), Vector2.zero);
+    protected calculateTransform(requestedTransforms: RequestTransformsFn, childCount: number, subProps: SubProps[], maxPossibleSize: Vector2): CalculatedTransform {
+        const childTransforms = this.requestTransformsDefault(requestedTransforms, childCount, maxPossibleSize);
+
+        let maxSize = Vector2.zero;
 
         return {
+            childTransforms: subProps.map((subProp, i) => {
+                const transform = childTransforms[i];
+
+                const position = subProp?.position ?? transform.position;
+                const width = transform.size.x;
+                const height = transform.size.y;
+
+                if (width > maxSize.x) maxSize = new Vector2(width, maxSize.y);
+                if (height > maxSize.y) maxSize = new Vector2(maxSize.x, height);
+
+                return {
+                    position,
+                    size: new Vector2(width, height),
+                    maxSize: maxPossibleSize
+                };
+            }),
             requestedTransform: {
                 position: Vector2.zero,
                 size: maxSize
-            },
-            childTransforms: infos.map(item => {
-                if (item.subProps?.position) {
-                    return {
-                        position: item.subProps.position,
-                        size: item.requestedTransform.size
-                    };
-                }
-
-                return item.requestedTransform;
-            })
+            }
         };
     }
 }

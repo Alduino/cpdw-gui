@@ -1,17 +1,22 @@
 import {WindowWrapper} from "../WindowWrapper";
-import {FlexLayout, Rectangle, render} from "../layout";
+import {AbsoluteLayout, FlexLayout, Rectangle, render} from "../layout";
 import React, {FC} from "react";
 import {WebGLImpl} from "../graphics";
 import {perFrame} from "../WindowUtils";
+import {Text} from "../layout/components/Text";
 
 const App: FC = () => {
     return (
-        <FlexLayout direction="horiz" padding={5} gap={5}>
-            <Rectangle />
-            <Rectangle />
-            <Rectangle flexFr={2} />
-            <Rectangle flexFr={1} />
-        </FlexLayout>
+        <AbsoluteLayout absolutePosition={[0, 0]}>
+            <FlexLayout direction="horiz" padding={5} gap={5}>
+                <Rectangle size="100px" />
+                <AbsoluteLayout flexFr={1}>
+                    <Rectangle size="50%" />
+                    <Text value="Hello!" />
+                </AbsoluteLayout>
+                <Rectangle size={200} />
+            </FlexLayout>
+        </AbsoluteLayout>
     );
 };
 

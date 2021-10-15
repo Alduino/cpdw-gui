@@ -8,7 +8,7 @@ export interface AbsoluteLayoutProps {
 }
 
 export interface AbsoluteLayoutSubProps {
-    position: Vec2;
+    position?: Vec2;
 }
 
 function convSubProps(input: SubPropSourceOf<AbsoluteLayoutSubProps, AbsoluteLayoutNode>): SubPropIntrinsicOf<typeof AbsoluteLayoutNode> {

@@ -1,16 +1,16 @@
 import React, {FC} from "react";
 import {intrinsic} from "../dom/intrinsic-elements";
-import {vec2, Vec2} from "../utils";
+import {size2, Size2Bases} from "../utils";
 import {SubPropSource, useSubPropMap} from "./subprob-map";
 
 export interface RectangleProps {
-    size?: Vec2;
+    size?: Size2Bases;
 }
 
 export const Rectangle: FC<RectangleProps & SubPropSource> = ({size, ...props}) => {
     const subPropMap = useSubPropMap();
 
     return (
-        <intrinsic.rectangle size={vec2(size, [100, 100])} {...subPropMap(props)}/>
+        <intrinsic.rectangle size={size2(size, [100, 100])} {...subPropMap(props)}/>
     );
 };
